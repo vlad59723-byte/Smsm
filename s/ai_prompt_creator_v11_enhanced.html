@@ -2529,6 +2529,128 @@
             }
 
             animeTitleInput.addEventListener('input', handleAnimeTitleInput);
+
+            // --- "Pick Tags" feature ---
+            const suggestTagsBtn = document.getElementById('suggest-tags-btn');
+
+            async function handleSuggestTags() {
+                const idea = ideaInput.value.trim();
+                const prompt = promptOutput.value.trim();
+
+                if (!idea) {
+                    showNotification('Please enter an idea to suggest tags.', 'warning');
+                    return;
+                }
+
+                if (!prompt) {
+                    showNotification('Please generate a prompt before suggesting tags.', 'warning');
+                    return;
+                }
+
+                const originalBtnText = suggestTagsBtn.innerHTML;
+                suggestTagsBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating...
+                `;
+                suggestTagsBtn.disabled = true;
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/generate-tags', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            idea: idea,
+                            prompt: prompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `Server error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    let currentDetails = detailsTextarea.value.trim();
+                    if (currentDetails.length > 0 && !currentDetails.endsWith(',')) {
+                        currentDetails += ', ';
+                    }
+                    detailsTextarea.value = currentDetails + data.generatedTags;
+                    showNotification('Tags generated successfully!', 'success');
+                } catch (error) {
+                    console.error('Tag suggestion failed:', error);
+                    showNotification(`Error suggesting tags: ${error.message}`, 'error');
+                } finally {
+                    suggestTagsBtn.innerHTML = originalBtnText;
+                    suggestTagsBtn.disabled = false;
+                }
+            }
+
+            suggestTagsBtn.addEventListener('click', handleSuggestTags);
+
+            // --- "Predict Problems" feature ---
+            const predictProblemsBtn = document.getElementById('predict-problems-btn');
+
+            async function handlePredictProblems() {
+                const idea = ideaInput.value.trim();
+                const prompt = promptOutput.value.trim();
+
+                if (!idea) {
+                    showNotification('Please enter an idea to predict problems.', 'warning');
+                    return;
+                }
+
+                if (!prompt) {
+                    showNotification('Please generate a prompt before predicting problems.', 'warning');
+                    return;
+                }
+
+                const originalBtnText = predictProblemsBtn.innerHTML;
+                predictProblemsBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Predicting...
+                `;
+                predictProblemsBtn.disabled = true;
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/predict-problems', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            idea: idea,
+                            prompt: prompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `Server error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    let currentNegative = negativePromptTextarea.value.trim();
+                    if (currentNegative.length > 0 && !currentNegative.endsWith(',')) {
+                        currentNegative += ', ';
+                    }
+                    negativePromptTextarea.value = currentNegative + data.predictedProblems;
+                    showNotification('Problem prediction successful!', 'success');
+                } catch (error) {
+                    console.error('Problem prediction failed:', error);
+                    showNotification(`Error predicting problems: ${error.message}`, 'error');
+                } finally {
+                    predictProblemsBtn.innerHTML = originalBtnText;
+                    predictProblemsBtn.disabled = false;
+                }
+            }
+
+            predictProblemsBtn.addEventListener('click', handlePredictProblems);
         });
     </script>
 </body>
