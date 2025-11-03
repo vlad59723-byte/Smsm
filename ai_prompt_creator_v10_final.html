@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Creator Pro (Ultimate Edition) v11 Enhanced</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #3B82F6; 
+            --secondary-color: #2563EB; 
+            --accent-color: #EF4444; 
+            --background-color: #F9FAFB; 
+            --text-color: #1F2937; 
+            --light-gray: #E5E7EB; 
+            --medium-gray: #6B7280; 
+            --dark-gray: #374151; 
+            --success-color: #10B981; 
+            --warning-color: #F59E0B; 
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 9999px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .model-radio:checked + span {
+            border-color: var(--primary-color);
+            background-color: #EFF6FF; 
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: var(--success-color);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(100%);
+        }
+        .toggle-label {
+            width: 40px;
+            height: 20px;
+            background-color: var(--medium-gray);
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="https://placehold.co/40x40/3B82F6/FFFFFF?text=AI" alt="AI Prompt Creator" class="rounded-lg">
+                <h1 class="text-2xl font-bold text-blue-600">AI Prompt Creator Pro (Ultimate) v11 Enhanced</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-4 md:space-x-6">
+                    <li><a href="#" class="font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 border-b-2 border-blue-600 pb-1">Главная</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <section class="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-16 text-center">
+            <div class="container mx-auto max-w-4xl px-4">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Создавайте идеальные промпты для Sora и Veo</h2>
+                <p class="text-xl text-blue-100 max-w-2xl mx-auto">Превратите вашу простую идею в детализированный, профессиональный промпт для генерации видео.</p>
+            </div>
+        </section>
+
+        <section class="py-12 md:py-16">
+            <div class="container mx-auto max-w-4xl px-4">
+                
+<div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-5 text-gray-800">1. Выберите модель ИИ:</h3>
+                    
+                    <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="enable-model-selection" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                            <span class="ml-3 text-sm font-medium text-gray-700">Включить выбор между Sora и Veo (если отключено, доступны все функции)</span>
+                        </label>
+                        <p class="text-xs text-gray-500 mt-2 ml-8">При отключении чекбокса вы сможете использовать все функции, включая Veo-специфичные (например, Аудио).</p>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">1.5. Выберите модель Gemini:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="generation-model" value="gemini-2.5-flash" class="model-radio hidden" checked>
+                            <span class="model-radio-label flex items-center p-5 border-2 border-gray-200 rounded-lg transition-all duration-200 hover:border-blue-500">
+                                <div>
+                                    <span class="text-lg font-bold text-gray-900">Gemini 2.5 Flash</span>
+                                    <span class="block text-sm text-gray-500">Быстрая / По умолчанию</span>
+                                </div>
+                            </span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="generation-model" value="gemini-2.5-pro" class="model-radio hidden">
+                            <span class="model-radio-label flex items-center p-5 border-2 border-gray-200 rounded-lg transition-all duration-200 hover:border-blue-500">
+                                <div>
+                                    <span class="text-lg font-bold text-gray-900">Gemini 2.5 Pro</span>
+                                    <span class="block text-sm text-gray-500">Мощная / Для сложных промптов</span>
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="model-selection-container">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="model" value="sora" class="model-radio hidden" checked>
+                            <span class="model-radio-label flex items-center p-5 border-2 border-gray-200 rounded-lg transition-all duration-200 hover:border-blue-500">
+                                <svg class="w-8 h-8 mr-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <div>
+                                    <span class="text-lg font-bold text-gray-900">Sora</span>
+                                    <span class="block text-sm text-gray-500">OpenAI</span>
+                                </div>
+                            </span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="model" value="veo" class="model-radio hidden">
+                            <span class="model-radio-label flex items-center p-5 border-2 border-gray-200 rounded-lg transition-all duration-200 hover:border-blue-500">
+                                <svg class="w-8 h-8 mr-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <span class="text-lg font-bold text-gray-900">Veo</span>
+                                    <span class="block text-sm text-gray-500">Google DeepMind</span>
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+
+                <!-- Presets Section -->
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-5 text-gray-800">2. Шаблоны (Пресеты):</h3>
+                    <div class="flex flex-wrap gap-3" id="preset-buttons">
+                        <button data-preset="cinematic-epic" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Эпический Кинематограф</button>
+                        <button data-preset="cyberpunk-neon" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Киберпанк Неон</button>
+                        <button data-preset="pixar-animation" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Анимация Pixar</button>
+                        <button data-preset="documentary-nature" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Документальный (Природа)</button>
+                        <button data-preset="low-key-noir" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Мрачный Нуар</button>
+                        <button data-preset="vintage-vhs" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Винтаж VHS</button>
+                        <button data-preset="fantasy-magic" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Фэнтези Магия</button>
+                        <button data-preset="wes-anderson" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Стиль Wes Anderson</button>
+                        <button data-preset="post-apocalypse" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Постапокалипсис</button>
+                        <button data-preset="anime-ghibli" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Аниме (Ghibli)</button>
+                        <button data-preset="manga-style" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Манга (Ч/Б)</button>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">Нажмите, чтобы автоматически заполнить все параметры.</p>
+                </div>
+                <!-- End Presets Section -->
+
+<div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                    <label for="idea-input" class="text-xl font-semibold mb-4 text-gray-800 block">3. Введите вашу идею:</label>
+                    <textarea id="idea-input" class="w-full min-h-[120px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: Наруто против Саске"></textarea>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                        <button id="improve-btn" class="primary-btn flex-1 px-8 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m0-16a1 1 0 00-1 1v16a1 1 0 102 0V4a1 1 0 00-1-1z"></path></svg>
+                            Улучшить промпт
+                        </button>
+                        <button id="super-improve-btn" class="secondary-btn flex-1 px-8 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Идея еще лучше
+                        </button>
+                    </div>
+
+                    <div class="mt-4">
+                        <button id="ai-autopilot-btn" class="w-full px-8 py-3 bg-purple-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17.25l-4.5-4.5m0 0l4.5-4.5m-4.5 4.5h16.5m-16.5 0h16.5"></path></svg>
+                            🤖 AI-Автопилот (Gemini выберет все)
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <button id="translate-to-english-btn" class="w-full px-8 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                            🇬🇧 Перевести промпт на английский
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <button id="generate-ideas-btn" class="w-full px-8 py-3 bg-yellow-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            💡 Генератор идей для видео
+                        </button>
+                    </div>
+                </div>
+                <!-- Duration Section -->
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xl font-semibold text-gray-800">4. Длительность (секунды):</h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-duration" class="toggle-checkbox hidden" checked>
+                            <span class="toggle-label"></span>
+                        </label>
+                    </div>
+                    <div class="param-content">
+                        <div class="flex flex-wrap gap-3 mb-4">
+                            <button data-duration="8" class="duration-btn px-4 py-2 bg-blue-50 text-blue-700 rounded-lg shadow-sm hover:bg-blue-100 transition-colors duration-200 font-medium">8 сек</button>
+                            <button data-duration="10" class="duration-btn px-4 py-2 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 transition-colors duration-200 font-medium">10 сек</button>
+                            <button data-duration="15" class="duration-btn px-4 py-2 bg-blue-50 text-blue-700 rounded-lg shadow-sm hover:bg-blue-100 transition-colors duration-200 font-medium">15 сек</button>
+                        </div>
+                        <label class="flex items-center space-x-2 mb-4">
+                            <input type="checkbox" id="custom-duration-toggle" class="form-checkbox text-blue-600 h-5 w-5">
+                            <span class="text-gray-700">Включить произвольную длительность</span>
+                        </label>
+                        <div id="custom-duration-slider-group" class="hidden">
+                            <input type="range" id="duration-slider" min="4" max="60" value="10" class="w-full">
+                            <p class="text-center text-lg font-bold mt-2"><span id="duration-value">10</span> секунд</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Duration Section -->
+
+                <!-- Parameters Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Стиль Видео -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Стиль Видео:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-style" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="realistic">Реалистичный (Photorealistic)</option>
+                                <option value="animation-3d">3D Анимация (Pixar/Disney)</option>
+                                <option value="anime">Аниме (Японская анимация)</option>
+                                <option value="abstract">Абстрактный</option>
+                                <option value="documentary">Документальный</option>
+                                <option value="stop-motion">Стоп-моушн</option>
+                                <option value="surreal">Сюрреалистичный</option>
+                                <option value="fantasy">Фэнтези (Высокое)</option>
+                                <option value="futuristic">Футуристический (Sci-Fi)</option>
+                                <option value="oil-painting">Масляная живопись</option>
+                                <option value="watercolor">Акварель</option>
+                                <option value="low-poly">Low Poly (3D)</option>
+                                <option value="voxel">Voxel (Minecraft Style)</option>
+                                <option value="pixel-art">Пиксель-арт (8-bit)</option>
+                                <option value="comic-book">Комикс (Стиль Marvel/DC)</option>
+                                <option value="noir">Нуар (Черно-белый, Драматический)</option>
+                                <option value="steampunk">Стимпанк</option>
+                                <option value="cyberpunk">Киберпанк</option>
+                                <option value="minimalist">Минималистичный</option>
+                                <option value="hyperrealism">Гиперреализм</option>
+                                <option value="cinematic">Кинематографический</option>
+                                <option value="vintage">Винтажный (50s/60s)</option>
+                                <option value="glitch-art">Глитч-арт</option>
+                                <option value="grunge">Гранж</option>
+                                <option value="sketch">Карандашный набросок</option>
+                                <option value="pop-art">Поп-арт (Стиль Энди Уорхола)</option>
+                                <option value="impressionism">Импрессионизм</option>
+                                <option value="expressionism">Экспрессионизм</option>
+                                <option value="photogrammetry">Фотограмметрия</option>
+                                <option value="tilt-shift">Тилт-шифт (Миниатюра)</option>
+                                <option value="claymation">Пластилиновая анимация</option>
+                                <option value="rotoscoping">Ротоскопирование</option>
+                            </select>
+                            <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="style">🤖 Предложить стиль</button>
+                        </div>
+                    </div>
+
+                    <!-- Настройки Аниме (Скрыто по умолчанию) -->
+                    <div id="anime-options-group" class="p-6 bg-yellow-50 rounded-xl shadow-lg hidden">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Настройки Аниме-стиля:</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="anime-studio" class="block text-sm font-medium text-gray-700">Студия/Автор:</label>
+                                <select id="anime-studio" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- Не выбрано --</option>
+                                    <option value="Studio Ghibli">Студия Ghibli (Миядзаки)</option>
+                                    <option value="Makoto Shinkai">Макото Синкай (Гиперреализм)</option>
+                                    <option value="Kyoto Animation">Kyoto Animation (KyoAni)</option>
+                                    <option value="MAPPA">MAPPA (Динамика, Жесткий стиль)</option>
+                                    <option value="Ufotable">Ufotable (Эффекты, CGI)</option>
+                                    <option value="Production I.G">Production I.G (Sci-Fi)</option>
+                                    <option value="Osamu Tezuka">Осаму Тэдзука (Классика)</option>
+                                    <option value="Satoshi Kon">Сатоси Кон (Сюрреализм)</option>
+                                    <option value="Katsuhiro Otomo">Кацухиро Отомо (Акира)</option>
+                                    <option value="Science SARU">Science SARU (Экспериментальный)</option>
+                                    <option value="Toei Animation">Toei Animation (Длинные сериалы)</option>
+                                    <option value="Gainax">Gainax (Эмоциональность)</option>
+                                    <option value="Trigger">Trigger (Экшн, Динамика)</option>
+                                    <option value="Bones">Bones (Экшн)</option>
+                                    <option value="Madhouse">Madhouse (Разнообразие жанров)</option>
+                                    <option value="Tatsunoko Production">Tatsunoko Production (Ретро)</option>
+                                    <option value="Sunrise">Sunrise (Меха, Гандам)</option>
+                                    <option value="Pierrot">Pierrot (Наруто, Блич)</option>
+                                    <option value="A-1 Pictures">A-1 Pictures (Sword Art Online)</option>
+                                    <option value="Wit Studio">Wit Studio (Атака Титанов)</option>
+                                    <option value="CloverWorks">CloverWorks (Spy x Family)</option>
+                                    <option value="David Production">David Production (JoJo)</option>
+                                    <option value="TMS Entertainment">TMS Entertainment (Детектив Конан)</option>
+                                    <option value="P.A. Works">P.A. Works (Красивые фоны)</option>
+                                    <option value="Shaft">Shaft (Стиль "Моногатари")</option>
+                                    <option value="CoMix Wave Films">CoMix Wave Films (Синкай)</option>
+                                    <option value="Studio 4°C">Studio 4°C (Экспериментальное)</option>
+                                    <option value="Khara">Khara (Евангелион)</option>
+                                    <option value="Orange">Orange (3D CGI)</option>
+                                    <option value="J.C.Staff">J.C.Staff (Toradora, Food Wars)</option>
+                                    <option value="Doga Kobo">Doga Kobo (Slice of Life)</option>
+                                    <option value="White Fox">White Fox (Re:Zero, Steins;Gate)</option>
+                                    <option value="Kinema Citrus">Kinema Citrus (Made in Abyss)</option>
+                                    <option value="Lerche">Lerche (Assassination Classroom)</option>
+                                    <option value="Brain's Base">Brain's Base (Durarara!!)</option>
+                                    <option value="Manglobe">Manglobe (Samurai Champloo)</option>
+                                    <option value="Gonzo">Gonzo (Hellsing, Afro Samurai)</option>
+                                    <option value="AIC">AIC (Tenchi Muyo!)</option>
+                                    <option value="Artland">Artland (Mushishi)</option>
+                                    <option value="Bee Train">Bee Train (.hack//SIGN)</option>
+                                    <option value="Brains Base">Brains Base (Natsume's Book)</option>
+                                    <option value="C2C">C2C (Harukana Receive)</option>
+                                    <option value="Deen">Deen (Fate/stay night)</option>
+                                    <option value="Diomedéa">Diomedéa (Squid Girl)</option>
+                                    <option value="EMT Squared">EMT Squared (Astra Lost in Space)</option>
+                                    <option value="Encourage Films">Encourage Films (Kemono Friends)</option>
+                                    <option value="Feel">Feel (Oregairu S3)</option>
+                                    <option value="Gallop">Gallop (Yu-Gi-Oh!)</option>
+                                    <option value="GoHands">GoHands (K Project)</option>
+                                    <option value="Graphinica">Graphinica (Hellsing Ultimate)</option>
+                                    <option value="Hal Film Maker">Hal Film Maker (Aria)</option>
+                                    <option value="Hoods Entertainment">Hoods Entertainment (Magi)</option>
+                                    <option value="LIDENFILMS">LIDENFILMS (Tokyo Revengers)</option>
+                                    <option value="Liden Films">Liden Films (Berserk 2016)</option>
+                                    <option value="Millepensee">Millepensee (Teekyuu)</option>
+                                    <option value="Nexus">Nexus (Chivalry of a Failed Knight)</option>
+                                    <option value="Nippon Animation">Nippon Animation (World Masterpiece)</option>
+                                    <option value="Nomad">Nomad (Rozen Maiden)</option>
+                                    <option value="OLM">OLM (Pokémon)</option>
+                                    <option value="Passione">Passione (Citrus)</option>
+                                    <option value="Pine Jam">Pine Jam (Gamers!)</option>
+                                    <option value="Project No.9">Project No.9 (Ro-Kyu-Bu!)</option>
+                                    <option value="Satelight">Satelight (Macross Frontier)</option>
+                                    <option value="Seven">Seven (Nanana's Buried Treasure)</option>
+                                    <option value="Seven Arcs">Seven Arcs (Magical Girl Lyrical Nanoha)</option>
+                                    <option value="Silver Link">Silver Link (Non Non Biyori)</option>
+                                    <option value="Studio Bind">Studio Bind (Mushoku Tensei)</option>
+                                    <option value="Studio Chizu">Studio Chizu (Wolf Children)</option>
+                                    <option value="Studio Colorido">Studio Colorido (Penguin Highway)</option>
+                                    <option value="Studio Deen">Studio Deen (Konosuba)</option>
+                                    <option value="Studio Kai">Studio Kai (Super Cub)</option>
+                                    <option value="Studio Pierrot">Studio Pierrot (Tokyo Ghoul)</option>
+                                    <option value="Studio Ponoc">Studio Ponoc (Mary and the Witch's Flower)</option>
+                                    <option value="Tatsunoko">Tatsunoko (Speed Racer)</option>
+                                    <option value="Telecom Animation Film">Telecom Animation Film (Lupin III)</option>
+                                    <option value="TNK">TNK (High School DxD)</option>
+                                    <option value="Triangle Staff">Triangle Staff (Macross)</option>
+                                    <option value="Troyca">Troyca (Aldnoah.Zero)</option>
+                                    <option value="Xebec">Xebec (Space Battleship Yamato)</option>
+                                    <option value="Zexcs">Zexcs (Umineko)</option>
+                                    <option value="8bit">8bit (That Time I Got Reincarnated)</option>
+                                    <option value="Actas">Actas (Girls und Panzer)</option>
+                                    <option value="Arms">Arms (Elfen Lied)</option>
+                                    <option value="Asread">Asread (Mirai Nikki)</option>
+                                    <option value="Bandai Namco Pictures">Bandai Namco Pictures (Love Live!)</option>
+                                    <option value="Bibury Animation Studios">Bibury Animation Studios (Azur Lane)</option>
+                                    <option value="Bridge">Bridge (Fairy Tail)</option>
+                                    <option value="C-Station">C-Station (Encouragement of Climb)</option>
+                                    <option value="Children's Playground Entertainment">Children's Playground (Arifureta)</option>
+                                    <option value="Creators in Pack">Creators in Pack (Yuru Camp)</option>
+                                    <option value="Eiken">Eiken (Sazae-san)</option>
+                                    <option value="Engi">Engi (Uzaki-chan)</option>
+                                    <option value="Felix Film">Felix Film (Heidi)</option>
+                                    <option value="Geek Toys">Geek Toys (Plunderer)</option>
+                                    <option value="Geno Studio">Geno Studio (Golden Kamuy)</option>
+                                    <option value="Encourage Films">Encourage Films (Kemono Friends)</option>
+                                    <option value="Lay-duce">Lay-duce (Classroom of the Elite)</option>
+                                    <option value="MAHO FILM">MAHO FILM (Isekai Cheat Magician)</option>
+                                    <option value="Marvy Jack">Marvy Jack (Keijo!!!!!!!!)</option>
+                                    <option value="NAZ">NAZ (Hajimete no Gal)</option>
+                                    <option value="Nut">Nut (Saga of Tanya the Evil)</option>
+                                    <option value="Polygon Pictures">Polygon Pictures (Knights of Sidonia)</option>
+                                    <option value="Quad">Quad (Domestic Girlfriend)</option>
+                                    <option value="Sanzigen">Sanzigen (BanG Dream!)</option>
+                                    <option value="Tezuka Productions">Tezuka Productions (Black Jack)</option>
+                                    <option value="Typhoon Graphics">Typhoon Graphics (Aggressive Retsuko)</option>
+                                    <option value="Yostar Pictures">Yostar Pictures (Arknights)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="anime-style" class="block text-sm font-medium text-gray-700">Стиль Рисовки/Манги:</label>
+                                <select id="anime-style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- Не выбрано --</option>
+                                    <option value="Manga Style">Стиль Манги (Ч/Б, Штриховка)</option>
+                                    <option value="Cel Shading">Сел-шейдинг (Плоские тени)</option>
+                                    <option value="Digital Painting">Цифровая живопись (Мягкие переходы)</option>
+                                    <option value="Traditional Hand-Drawn">Традиционная ручная рисовка</option>
+                                    <option value="Chibi/SD">Чиби/SD (Милый)</option>
+                                    <option value="Mecha/Gundam">Меха/Гандам (Техника)</option>
+                                    <option value="Moé">Моэ (Милый, Нежный)</option>
+                                    <option value="Retro 90s Anime">Ретро Аниме 90-х (Зерно)</option>
+                                    <option value="Ukiyo-e">Укиё-э (Японская гравюра)</option>
+                                    <option value="Shoujo Manga">Стиль Сёдзё Манги (Цветы, Блеск)</option>
+                                    <option value="Shonen Manga">Стиль Сёнэн Манги (Экшн, Динамика)</option>
+                                    <option value="Gekiga">Гэкига (Драматический, Взрослый)</option>
+                                    <option value="Ink Wash">Тушь (Суми-э)</option>
+                                    <option value="Watercolor Backgrounds">Акварельные фоны</option>
+                                    <option value="Line Art">Чистый лайн-арт</option>
+                                    <option value="Thick Lines">Толстые контуры (Стиль Mob Psycho)</option>
+                                    <option value="Thin Lines">Тонкие контуры (Стиль KyoAni)</option>
+                                    <option value="Minimalist">Минималистичный</option>
+                                    <option value="High Contrast">Высокий контраст (Стиль JoJo)</option>
+                                    <option value="Pastel Colors">Пастельные цвета</option>
+                                    <option value="Vibrant Colors">Яркие, насыщенные цвета</option>
+                                    <option value="Monochromatic">Монохромный</option>
+                                    <option value="Screentone">Скринтон (Традиционная манга)</option>
+                                    <option value="Hatching">Штриховка (Hatching)</option>
+                                    <option value="Cross-hatching">Перекрестная штриховка</option>
+                                    <option value="Stippling">Пуантилизм (Stippling)</option>
+                                    <option value="Gradient Shading">Градиентные тени</option>
+                                    <option value="Flat Colors">Плоские цвета</option>
+                                    <option value="Soft Shading">Мягкие тени</option>
+                                    <option value="Hard Shadows">Жесткие тени</option>
+                                    <option value="Rim Lighting">Контурное освещение</option>
+                                    <option value="Glow Effects">Эффекты свечения</option>
+                                    <option value="Sparkles">Блестки и искры</option>
+                                    <option value="Speed Lines">Линии скорости</option>
+                                    <option value="Action Lines">Линии действия</option>
+                                    <option value="Focus Lines">Линии фокуса</option>
+                                    <option value="Halftone">Полутон (Halftone)</option>
+                                    <option value="Duotone">Дуотон (Двухцветный)</option>
+                                    <option value="Tritone">Тритон (Трехцветный)</option>
+                                    <option value="Neon Colors">Неоновые цвета</option>
+                                    <option value="Muted Colors">Приглушенные цвета</option>
+                                    <option value="Earth Tones">Земляные тона</option>
+                                    <option value="Cool Tones">Холодные тона</option>
+                                    <option value="Warm Tones">Теплые тона</option>
+                                    <option value="Desaturated">Ненасыщенные цвета</option>
+                                    <option value="Oversaturated">Пересыщенные цвета</option>
+                                    <option value="Noir Style">Стиль нуар (Черно-белый)</option>
+                                    <option value="Silhouette">Силуэты</option>
+                                    <option value="Outline Heavy">Толстые контуры</option>
+                                    <option value="No Outlines">Без контуров</option>
+                                    <option value="Colored Outlines">Цветные контуры</option>
+                                    <option value="Sketch Style">Стиль скетча</option>
+                                    <option value="Rough Sketch">Грубый скетч</option>
+                                    <option value="Clean Linework">Чистый лайнворк</option>
+                                    <option value="Loose Linework">Свободный лайнворк</option>
+                                    <option value="Detailed Linework">Детализированный лайнворк</option>
+                                    <option value="Simplified">Упрощенный стиль</option>
+                                    <option value="Realistic Proportions">Реалистичные пропорции</option>
+                                    <option value="Exaggerated Proportions">Преувеличенные пропорции</option>
+                                    <option value="Large Eyes">Большие глаза</option>
+                                    <option value="Small Eyes">Маленькие глаза</option>
+                                    <option value="Detailed Eyes">Детализированные глаза</option>
+                                    <option value="Sparkly Eyes">Блестящие глаза</option>
+                                    <option value="Dead Fish Eyes">Безжизненные глаза</option>
+                                    <option value="Sharp Features">Острые черты</option>
+                                    <option value="Soft Features">Мягкие черты</option>
+                                    <option value="Bishonen">Бисёнэн (Красивый юноша)</option>
+                                    <option value="Bishojo">Бисёдзё (Красивая девушка)</option>
+                                    <option value="Muscular">Мускулистый стиль</option>
+                                    <option value="Slender">Стройный стиль</option>
+                                    <option value="Cute/Kawaii">Милый/Кавайный</option>
+                                    <option value="Gothic">Готический стиль</option>
+                                    <option value="Steampunk">Стимпанк</option>
+                                    <option value="Cyberpunk Anime">Киберпанк аниме</option>
+                                    <option value="Fantasy Anime">Фэнтези аниме</option>
+                                    <option value="Sci-Fi Anime">Научная фантастика</option>
+                                    <option value="Horror Anime">Хоррор аниме</option>
+                                    <option value="Psychological">Психологический стиль</option>
+                                    <option value="Surreal">Сюрреалистичный</option>
+                                    <option value="Abstract">Абстрактный</option>
+                                    <option value="Geometric">Геометрический</option>
+                                    <option value="Organic">Органический</option>
+                                    <option value="Mechanical">Механический</option>
+                                    <option value="Painterly">Живописный</option>
+                                    <option value="Photorealistic">Фотореалистичный</option>
+                                    <option value="Stylized">Стилизованный</option>
+                                    <option value="Retro 80s">Ретро 80-х</option>
+                                    <option value="Retro 70s">Ретро 70-х</option>
+                                    <option value="Modern Digital">Современный цифровой</option>
+                                    <option value="Hand-painted">Ручная роспись</option>
+                                    <option value="Airbrush">Аэрограф</option>
+                                    <option value="Charcoal">Уголь</option>
+                                    <option value="Pencil">Карандаш</option>
+                                    <option value="Pen and Ink">Перо и чернила</option>
+                                    <option value="Marker">Маркер</option>
+                                    <option value="Crayon">Мелки</option>
+                                    <option value="Oil Paint">Масляная краска</option>
+                                    <option value="Acrylic Paint">Акриловая краска</option>
+                                    <option value="Gouache">Гуашь</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="anime-artist" class="block text-sm font-medium text-gray-700">Артист/Мангака:</label>
+                                <select id="anime-artist" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- Не выбрано --</option>
+                                    <option value="Hayao Miyazaki">Хаяо Миядзаки</option>
+                                    <option value="Makoto Shinkai">Макото Синкай</option>
+                                    <option value="Satoshi Kon">Сатоси Кон</option>
+                                    <option value="Katsuhiro Otomo">Кацухиро Отомо</option>
+                                    <option value="Osamu Tezuka">Осаму Тэдзука</option>
+                                    <option value="Mamoru Hosoda">Мамору Хосода</option>
+                                    <option value="Isao Takahata">Исао Такахата</option>
+                                    <option value="Hideaki Anno">Хидэаки Анно</option>
+                                    <option value="Masaaki Yuasa">Масааки Юаса</option>
+                                    <option value="Shinichiro Watanabe">Синитиро Ватанабэ</option>
+                                    <option value="Yoshiaki Kawajiri">Йосиаки Кавадзири</option>
+                                    <option value="Rintaro">Ринтаро</option>
+                                    <option value="Yoshiyuki Tomino">Йосиюки Томино</option>
+                                    <option value="Kunihiko Ikuhara">Кунихико Икухара</option>
+                                    <option value="Tensai Okamura">Тэнсай Окамура</option>
+                                    <option value="Akiyuki Shinbo">Акиюки Синбо</option>
+                                    <option value="Naoko Yamada">Наоко Ямада</option>
+                                    <option value="Hiroyuki Imaishi">Хироюки Имаиси</option>
+                                    <option value="Tetsuro Araki">Тэцуро Араки</option>
+                                    <option value="Eiichiro Oda">Эйитиро Ода (One Piece)</option>
+                                    <option value="Masashi Kishimoto">Масаси Кисимото (Naruto)</option>
+                                    <option value="Akira Toriyama">Акира Торияма (Dragon Ball)</option>
+                                    <option value="Hajime Isayama">Хадзимэ Исаяма (Attack on Titan)</option>
+                                    <option value="Kentaro Miura">Кэнтаро Миура (Berserk)</option>
+                                    <option value="Yoshihiro Togashi">Йосихиро Тогаси (Hunter x Hunter)</option>
+                                    <option value="Naoki Urasawa">Наоки Урасава (Monster)</option>
+                                    <option value="Takehiko Inoue">Такэхико Иноуэ (Slam Dunk)</option>
+                                    <option value="Hirohiko Araki">Хирохико Араки (JoJo's Bizarre Adventure)</option>
+                                    <option value="Tsugumi Ohba">Цугуми Оба (Death Note)</option>
+                                    <option value="Takeshi Obata">Такэси Обата (Death Note, Bakuman)</option>
+                                    <option value="CLAMP">CLAMP (Cardcaptor Sakura)</option>
+                                    <option value="Rumiko Takahashi">Румико Такахаси (Inuyasha)</option>
+                                    <option value="Junji Ito">Дзюндзи Ито (Horror)</option>
+                                    <option value="Sui Ishida">Суй Исида (Tokyo Ghoul)</option>
+                                    <option value="Tite Kubo">Тайто Кубо (Bleach)</option>
+                                    <option value="Hiro Mashima">Хиро Масима (Fairy Tail)</option>
+                                    <option value="Kohei Horikoshi">Кохэй Хорикоси (My Hero Academia)</option>
+                                    <option value="Koyoharu Gotouge">Коёхару Готоугэ (Demon Slayer)</option>
+                                    <option value="Gege Akutami">Гэгэ Акутами (Jujutsu Kaisen)</option>
+                                    <option value="Tatsuki Fujimoto">Тацуки Фудзимото (Chainsaw Man)</option>
+                                    <option value="ONE">ONE (One Punch Man, Mob Psycho)</option>
+                                    <option value="Yusuke Murata">Юсукэ Мурата (One Punch Man)</option>
+                                    <option value="Katsura Hoshino">Кацура Хосино (D.Gray-man)</option>
+                                    <option value="Yoshiki Tanaka">Йосики Танака (Legend of Galactic Heroes)</option>
+                                    <option value="Katsura Masakazu">Кацура Масакадзу (Video Girl Ai)</option>
+                                    <option value="Masamune Shirow">Масамунэ Сироу (Ghost in the Shell)</option>
+                                    <option value="Yoshitoshi ABe">Йоситоси АБе (Lain, Haibane Renmei)</option>
+                                    <option value="Range Murata">Рэндз Мурата (Last Exile)</option>
+                                    <option value="Kazuki Takahashi">Кадзуки Такахаси (Yu-Gi-Oh!)</option>
+                                    <option value="Nobuhiro Watsuki">Нобухиро Вацуки (Rurouni Kenshin)</option>
+                                    <option value="Yasuhiro Nightow">Ясухиро Найтоу (Trigun)</option>
+                                    <option value="Kouta Hirano">Коута Хирано (Hellsing)</option>
+                                    <option value="Tsutomu Nihei">Цутому Нихэй (Blame!)</option>
+                                    <option value="Hiromu Arakawa">Хирому Аракава (Fullmetal Alchemist)</option>
+                                    <option value="Yoshiyuki Sadamoto">Йосиюки Садамото (Evangelion)</option>
+                                    <option value="Monkey Punch">Манки Панч (Lupin III)</option>
+                                    <option value="Go Nagai">Го Нагай (Devilman)</option>
+                                    <option value="Leiji Matsumoto">Лэйдзи Мацумото (Captain Harlock)</option>
+                                    <option value="Mitsuru Adachi">Мицуру Адати (Touch)</option>
+                                    <option value="Kaoru Mori">Каору Мори (Emma)</option>
+                                    <option value="Ai Yazawa">Ай Язава (Nana)</option>
+                                    <option value="Natsuki Takaya">Нацуки Такая (Fruits Basket)</option>
+                                    <option value="Arina Tanemura">Арина Танэмура (Full Moon)</option>
+                                    <option value="Yuu Watase">Юу Ватасэ (Fushigi Yuugi)</option>
+                                    <option value="Kaori Yuki">Каори Юки (Angel Sanctuary)</option>
+                                    <option value="Matsuri Hino">Мацури Хино (Vampire Knight)</option>
+                                    <option value="Bisco Hatori">Биско Хатори (Ouran High School)</option>
+                                    <option value="Mitsuba Takanashi">Мицуба Таканаси (Crimson Hero)</option>
+                                    <option value="Katsuhisa Kigitsu">Кацухиса Кигицу</option>
+                                    <option value="Yuki Midorikawa">Юки Мидорикава (Natsume's Book)</option>
+                                    <option value="Kazue Kato">Кадзуэ Като (Blue Exorcist)</option>
+                                    <option value="Shinobu Ohtaka">Синобу Отака (Magi)</option>
+                                    <option value="Adachitoka">Адатитока (Noragami)</option>
+                                    <option value="Kafka Asagiri">Кафка Асагири (Bungo Stray Dogs)</option>
+                                    <option value="Sango Harukawa">Санго Харукава (Bungo Stray Dogs)</option>
+                                    <option value="Haruichi Furudate">Харуити Фурудатэ (Haikyuu!!)</option>
+                                    <option value="Tadatoshi Fujimaki">Тадатоси Фудзимаки (Kuroko's Basketball)</option>
+                                    <option value="Yuto Tsukuda">Юто Цукуда (Food Wars!)</option>
+                                    <option value="Shun Saeki">Сун Саэки (Food Wars!)</option>
+                                    <option value="Reki Kawahara">Рэки Кавахара (Sword Art Online)</option>
+                                    <option value="abec">abec (Sword Art Online)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="anime-manga-input" class="block text-sm font-medium text-gray-700">Тайтл/Манга (опционально):</label>
+                                <input type="text" id="anime-manga-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Например: Attack on Titan, One Piece">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- План/Движение Камеры -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">План/Движение Камеры:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-camera" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="camera" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="medium-shot">Средний план (Medium Shot)</option>
+                                <option value="wide-shot">Широкий план (Wide Shot)</option>
+                                <option value="close-up">Крупный план (Close-Up)</option>
+                                <option value="extreme-close-up">Экстремально крупный план</option>
+                                <option value="long-shot">Дальний план (Long Shot)</option>
+                                <option value="establishing-shot">Установочный план (Establishing Shot)</option>
+                                <option value="dutch-angle">Голландский угол (Dutch Angle)</option>
+                                <option value="low-angle">Нижний ракурс (Low Angle)</option>
+                                <option value="high-angle">Верхний ракурс (High Angle)</option>
+                                <option value="overhead-shot">Съемка сверху (Overhead/Drone)</option>
+                                <option value="tracking">Следящая камера (Tracking Shot)</option>
+                                <option value="dolly-zoom">Транстрав (Dolly Zoom/Vertigo Effect)</option>
+                                <option value="pan-left">Панорамирование влево</option>
+                                <option value="pan-right">Панорамирование вправо</option>
+                                <option value="tilt-up">Наклон вверх</option>
+                                <option value="tilt-down">Наклон вниз</option>
+                                <option value="crane-shot">Съемка с крана (Crane Shot)</option>
+                                <option value="handheld">Ручная камера (Handheld, Дрожание)</option>
+                                <option value="steadicam">Стедикам (Плавное движение)</option>
+                                <option value="point-of-view">От первого лица (POV)</option>
+                                <option value="reverse-shot">Обратный кадр</option>
+                                <option value="arc-shot">Вращение вокруг объекта (Arc Shot)</option>
+                                <option value="zoom-in">Быстрое приближение (Zoom In)</option>
+                                <option value="zoom-out">Быстрое отдаление (Zoom Out)</option>
+                                <option value="slow-motion">Замедленная съемка (Slow Motion)</option>
+                                <option value="time-lapse">Таймлапс (Ускоренная съемка)</option>
+                                <option value="bullet-time">Эффект "Матрицы" (Bullet Time)</option>
+                                <option value="macro-shot">Макро-съемка</option>
+                                <option value="micro-shot">Микро-съемка (Под микроскопом)</option>
+                                <option value="gimbal-shot">Съемка с гимбала (Идеально плавно)</option>
+                                <option value="whip-pan">Резкий переход (Whip Pan)</option>
+                                <option value="rack-focus">Перевод фокуса (Rack Focus)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Освещение -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Освещение:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-lighting" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="lighting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="natural">Естественное (Natural Light)</option>
+                                <option value="cinematic">Кинематографическое (Dramatic)</option>
+                                <option value="neon">Неоновое (Neon Glow)</option>
+                                <option value="backlight">Контровое (Backlight)</option>
+                                <option value="soft">Мягкое (Soft Lighting)</option>
+                                <option value="hard">Жесткое (Hard Lighting, Резкие тени)</option>
+                                <option value="low-key">Низкий ключ (Low-Key, Много теней)</option>
+                                <option value="high-key">Высокий ключ (High-Key, Яркое, Без теней)</option>
+                                <option value="volumetric">Объемный свет (Volumetric Lighting/God Rays)</option>
+                                <option value="rim-light">Контурный свет (Rim Light)</option>
+                                <option value="studio-light">Студийное (Studio Lighting)</option>
+                                <option value="candlelight">Свечи (Теплое, Мерцающее)</option>
+                                <option value="fluorescent">Флуоресцентное (Холодное, Лампы)</option>
+                                <option value="strobe">Стробоскоп (Strobe Light)</option>
+                                <option value="magic-glow">Волшебное свечение (Magic Glow)</option>
+                                <option value="sunset">Закатное (Golden Hour)</option>
+                                <option value="moonlight">Лунное (Холодное, Синее)</option>
+                                <option value="underwater">Подводное (Зеленоватое)</option>
+                                <option value="firelight">Свет костра (Оранжевое)</option>
+                                <option value="street-lamp">Уличный фонарь (Желтое)</option>
+                                <option value="spotlight">Прожектор (Spotlight)</option>
+                                <option value="fill-light">Заполняющий свет (Fill Light)</option>
+                                <option value="practical-light">Практический свет (Лампы в кадре)</option>
+                                <option value="ambient-occlusion">Ambient Occlusion (Мягкие тени)</option>
+                                <option value="ray-tracing">Ray Tracing (Реалистичные отражения)</option>
+                                <option value="chromatic-aberration">Хроматическая аберрация</option>
+                                <option value="flare">Блик (Lens Flare)</option>
+                                <option value="two-tone">Двухцветное (Two-Tone Lighting)</option>
+                                <option value="dramatic">Драматическое (Chiaroscuro)</option>
+                                <option value="silhouetted">Силуэтное (Silhouetted)</option>
+                                <option value="foggy">Туманное (Foggy)</option>
+                                <option value="rainy">Дождливое (Wet Surfaces)</option>
+                            </select>
+                            <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="lighting">🤖 Предложить освещение</button>
+                        </div>
+                    </div>
+
+                    <!-- Настроение/Эмоция -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Настроение/Эмоция:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mood" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="mood" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="epic">Эпическое (Epic)</option>
+                                <option value="joyful">Радостное (Joyful)</option>
+                                <option value="tense">Напряженное (Tense)</option>
+                                <option value="calm">Спокойное (Calm)</option>
+                                <option value="nostalgic">Ностальгическое (Nostalgic)</option>
+                                <option value="magical">Волшебное (Magical)</option>
+                                <option value="dystopian">Дистопическое (Dystopian)</option>
+                                <option value="whimsical">Причудливое (Whimsical)</option>
+                                <option value="melancholic">Меланхоличное (Melancholic)</option>
+                                <option value="ominous">Зловещее (Ominous)</option>
+                                <option value="ethereal">Эфирное (Ethereal)</option>
+                                <option value="surreal">Сюрреалистическое (Surreal)</option>
+                                <option value="romantic">Романтическое (Romantic)</option>
+                                <option value="horror">Ужас (Horror)</option>
+                                <option value="action">Экшн (Action-Packed)</option>
+                                <option value="peaceful">Мирное (Peaceful)</option>
+                                <option value="mysterious">Таинственное (Mysterious)</option>
+                                <option value="dramatic">Драматическое (Dramatic)</option>
+                                <option value="gloomy">Мрачное (Gloomy)</option>
+                                <option value="hopeful">Обнадеживающее (Hopeful)</option>
+                                <option value="isolated">Изолированное (Isolated)</option>
+                                <option value="energetic">Энергичное (Energetic)</option>
+                                <option value="dreamlike">Сонное (Dreamlike)</option>
+                                <option value="chaotic">Хаотичное (Chaotic)</option>
+                                <option value="suspenseful">Напряженное (Suspenseful)</option>
+                                <option value="spiritual">Духовное (Spiritual)</option>
+                                <option value="futuristic">Футуристическое (Futuristic)</option>
+                                <option value="historical">Историческое (Historical)</option>
+                                <option value="meditative">Медитативное (Meditative)</option>
+                                <option value="silly">Глупое (Silly)</option>
+                                <option value="intense">Интенсивное (Intense)</option>
+                                <option value="warm">Теплое (Warm)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Кинематография (Соотношение сторон) -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Кинематография (Соотношение сторон):</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-cinematography" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="cinematography" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="16:9">16:9 (Стандарт HD, YouTube)</option>
+                                <option value="21:9">21:9 (Широкоэкранный, Cinematic)</option>
+                                <option value="4:3">4:3 (Винтаж, Ретро)</option>
+                                <option value="1:1">1:1 (Квадрат, Instagram)</option>
+                                <option value="9:16">9:16 (Вертикальный, Reels/TikTok)</option>
+                                <option value="2.35:1">2.35:1 (Ultra Panavision)</option>
+                                <option value="1.85:1">1.85:1 (Американский стандарт)</option>
+                                <option value="2.76:1">2.76:1 (Ben-Hur)</option>
+                                <option <option value="anamorphic">Анаморфный объектив (Anamorphic Lens)</option>
+                                <option value="spherical">Сферический объектив (Spherical Lens)</option>
+                                <option value="fisheye">Рыбий глаз (Fisheye Lens)</option>
+                                <option value="macro">Макро объектив (Macro Lens)</option>
+                                <option value="telephoto">Телеобъектив (Telephoto Lens)</option>
+                                <option value="wide-angle">Широкоугольный объектив (Wide-Angle Lens)</option>
+                                <option value="prime-lens">Фикс-объектив (Prime Lens)</option>
+                                <option value="zoom-lens">Зум-объектив (Zoom Lens)</option>
+                                <option value="vintage-lens">Винтажный объектив (Vintage Lens)</option>
+                                <option value="low-depth">Малая глубина резкости (Shallow Depth of Field)</option>
+                                <option value="deep-depth">Большая глубина резкости (Deep Depth of Field)</option>
+                                <option value="bokeh">Боке (Bokeh)</option>
+                                <option value="film-grain">Пленка (Film Grain)</option>
+                                <option value="digital-clean">Цифровое (Digital Clean)</option>
+                                <option value="vhs-tape">VHS-пленка (VHS Tape)</option>
+                                <option value="super-8">Super 8mm Film</option>
+                                <option value="16mm">16mm Film</option>
+                                <option value="35mm">35mm Film</option>
+                                <option value="imax">IMAX Format</option>
+                                <option value="technicolor">Техниколор (Technicolor)</option>
+                                <option value="sepia">Сепия (Sepia Tone)</option>
+                                <option value="monochrome">Монохромный (Monochrome)</option>
+                                <option value="hdr">HDR (High Dynamic Range)</option>
+                                <option value="sdr">SDR (Standard Dynamic Range)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Визуальные Эффекты -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Визуальные Эффекты:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-effect" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="effect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="none">Без эффектов</option>
+                                <option value="film-grain">Зернистость пленки (Film Grain)</option>
+                                <option value="glitch">Глитч (Glitch Effect)</option>
+                                <option value="depth-of-field">Глубина резкости (Depth of Field)</option>
+                                <option value="smoke-fog">Дым/Туман (Smoke/Fog)</option>
+                                <option value="vhs">Эффект VHS</option>
+                                <option value="god-rays">Лучи света (God Rays)</option>
+                                <option value="chromatic-aberration">Хроматическая аберрация</option>
+                                <option value="lens-flare">Блик объектива (Lens Flare)</option>
+                                <option value="particles">Частицы (Particles, Пыль, Искры)</option>
+                                <option value="time-lapse">Таймлапс (Time-Lapse)</option>
+                                <option value="slow-motion">Замедленная съемка (Slow Motion)</option>
+                                <option value="bullet-time">Эффект "Матрицы" (Bullet Time)</option>
+                                <option value="stop-motion">Стоп-моушн (Stop Motion)</option>
+                                <option value="tilt-shift">Тилт-шифт (Tilt-Shift)</option>
+                                <option value="motion-blur">Размытие движения (Motion Blur)</option>
+                                <option value="double-exposure">Двойная экспозиция</option>
+                                <option value="anamorphic-flare">Анаморфный блик</option>
+                                <option value="rain">Дождь (Rain)</option>
+                                <option value="snow">Снег (Snow)</option>
+                                <option value="fire">Огонь (Fire)</option>
+                                <option value="water-splash">Брызги воды (Water Splash)</option>
+                                <option value="electric-sparks">Электрические искры</option>
+                                <option value="hologram">Голограмма (Hologram)</option>
+                                <option value="neon-lines">Неоновые линии (Neon Lines)</option>
+                                <option value="scanlines">Сканлайны (Scanlines)</option>
+                                <option value="pixelation">Пикселизация</option>
+                                <option value="distortion">Искажение (Distortion)</option>
+                                <option value="vignette">Виньетка (Vignette)</option>
+                                <option value="color-grading">Цветокоррекция (Specific Color Grade)</option>
+                                <option value="noise">Шум (Noise)</option>
+                                <option value="bloom">Свечение (Bloom)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Анимация Фото -->
+                    <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Анимация Фото (Шаблоны):</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-photo-animation" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="photo-animation" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="none">Без анимации</option>
+                                <option value="parallax-zoom">Параллакс с зумом (Parallax Zoom Effect)</option>
+                                <option value="ken-burns">Эффект Кена Бернса (Ken Burns Effect - Slow Pan & Zoom)</option>
+                                <option value="cinemagraph">Синемаграф (Cinemagraph - Partial Motion)</option>
+                                <option value="morph-transition">Морфинг переход (Morphing Transition)</option>
+                                <option value="3d-rotation">Трехмерное вращение (3D Rotation)</option>
+                                <option value="depth-parallax">Глубинный параллакс (Depth-Based Parallax)</option>
+                                <option value="camera-push-in">Наезд камеры (Camera Push In)</option>
+                                <option value="camera-pull-out">Отъезд камеры (Camera Pull Out)</option>
+                                <option value="dolly-zoom">Долли-зум (Dolly Zoom / Vertigo Effect)</option>
+                                <option value="slow-pan-left">Медленный пан влево (Slow Pan Left)</option>
+                                <option value="slow-pan-right">Медленный пан вправо (Slow Pan Right)</option>
+                                <option value="slow-tilt-up">Медленный наклон вверх (Slow Tilt Up)</option>
+                                <option value="slow-tilt-down">Медленный наклон вниз (Slow Tilt Down)</option>
+                                <option value="orbit-rotation">Орбитальное вращение (Orbit Rotation)</option>
+                                <option value="reveal-wipe">Проявление с вытиранием (Reveal Wipe)</option>
+                                <option value="glitch-transition">Глитч-переход (Glitch Transition)</option>
+                                <option value="pixel-sort">Пиксельная сортировка (Pixel Sort Animation)</option>
+                                <option value="datamosh">Датамош (Datamosh Effect)</option>
+                                <option value="chromatic-split">Хроматическое разделение (Chromatic Split)</option>
+                                <option value="liquid-morph">Жидкостный морфинг (Liquid Morph)</option>
+                                <option value="particle-dispersion">Рассеивание частиц (Particle Dispersion)</option>
+                                <option value="freeze-frame-highlight">Стоп-кадр с подсветкой (Freeze Frame Highlight)</option>
+                                <option value="time-slice">Временной срез (Time Slice / Bullet Time)</option>
+                                <option value="seamless-loop">Бесшовный луп (Seamless Loop)</option>
+                                <option value="boomerang">Бумеранг (Boomerang - Forward & Reverse)</option>
+                                <option value="speed-ramp">Изменение скорости (Speed Ramp)</option>
+                                <option value="hyper-lapse">Гиперлапс (Hyper-Lapse)</option>
+                                <option value="stop-motion-style">Стиль стоп-мошн (Stop Motion Style)</option>
+                                <option value="2.5d-parallax">2.5D параллакс (2.5D Parallax)</option>
+                                <option value="depth-of-field-shift">Смещение глубины резкости (Depth of Field Shift)</option>
+                                <option value="animated-painting">Анимированная живопись (Animated Painting Effect)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-2">Шаблоны анимации фотографий для создания динамичных видео из статичных изображений.</p>
+                        </div>
+                    </div>
+
+                    <!-- Фон/Локация -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Фон/Локация:</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-background" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="background" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="urban-city">Городской пейзаж (Urban City)</option>
+                                <option value="nature-forest">Лес (Forest)</option>
+                                <option value="cyberpunk-street">Киберпанк улица (Neon, Rain)</option>
+                                <option value="abstract-geometric">Абстрактный/Геометрический</option>
+                                <option value="beach-ocean">Пляж/Океан</option>
+                                <option value="mountain-range">Горный хребет</option>
+                                <option value="desert">Пустыня (Desert)</option>
+                                <option value="space">Космос (Space, Stars)</option>
+                                <option value="historical-castle">Исторический замок</option>
+                                <option value="ancient-ruins">Древние руины</option>
+                                <option value="laboratory">Секретная лаборатория</option>
+                                <option value="medieval-village">Средневековая деревня</option>
+                                <option value="post-apocalyptic-wasteland">Постапокалиптическая пустошь</option>
+                                <option value="floating-island">Парящий остров (Фэнтези)</option>
+                                <option value="volcano">Активный вулкан</option>
+                                <option value="train-station">Старый вокзал</option>
+                                <option value="abandoned-factory">Заброшенный завод</option>
+                                <option value="rooftop-city">Крыша небоскреба (Ночь)</option>
+                                <option value="japanese-garden">Японский сад</option>
+                                <option value="wild-west">Дикий Запад</option>
+                                <option value="deep-sea-trench">Глубоководный желоб</option>
+                                <option value="alien-planet">Чужая планета</option>
+                                <option value="library">Старинная библиотека</option>
+                                <option value="hospital-corridor">Больничный коридор</option>
+                                <option value="concert-stage">Концертная сцена</option>
+                                <option value="classroom">Школьный класс</option>
+                                <option value="art-gallery">Художественная галерея</option>
+                                <option value="suburban-street">Пригородная улица</option>
+                                <option value="futuristic-city">Футуристический город</option>
+                                <option value="underground-bunker">Подземный бункер</option>
+                                <option value="swamp">Болото</option>
+                                <option value="canyon">Каньон</option>
+                                <option value="ice-cave">Ледяная пещера</option>
+                                <option value="space-station">Космическая станция</option>
+                                <option value="pirate-ship">Пиратский корабль</option>
+                                <option value="fairytale-forest">Сказочный лес</option>
+                                <option value="olympic-stadium">Олимпийский стадион</option>
+                                <option value="deserted-highway">Заброшенное шоссе</option>
+                                <option value="rainy-alley">Дождливый переулок</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Аудио (Veo Only) -->
+                    <div id="audio-group" class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-gray-800">Аудио (Veo Only):</h3>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-audio" class="toggle-checkbox hidden" checked>
+                                <span class="toggle-label"></span>
+                            </label>
+                        </div>
+                        <div class="param-content">
+                            <select id="audio" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="none">Без звука</option>
+                                <option value="epic-music">Эпичная оркестровая музыка</option>
+                                <option value="synthwave-music">Синтвейв/Ретро музыка</option>
+                                <option value="lo-fi-music">Lo-fi/Спокойная музыка</option>
+                                <option value="nature-sounds">Звуки природы (ветер, дождь)</option>
+                                <option value="voiceover">Голос за кадром (Voiceover)</option>
+                                <option value="sound-effects">Звуковые эффекты (взрывы, шаги)</option>
+                                <option value="ambient">Атмосферный эмбиент</option>
+                                <option value="rock">Энергичный рок/метал</option>
+                                <option value="jazz">Джаз (Саксофон, Ночной клуб)</option>
+                                <option value="classical">Классическая музыка (Фортепиано, Струнные)</option>
+                                <option value="hip-hop">Хип-хоп (Бит, Бас)</option>
+                                <option value="electronic-trance">Электронная музыка (Транс, Драйв)</option>
+                                <option value="horror-score">Хоррор-саундтрек (Дисонанс)</option>
+                                <option value="cinematic-boom">Кинематографический БУМ (Низкий бас)</option>
+                                <option value="footsteps">Звук шагов</option>
+                                <option value="rain-on-window">Звук дождя по окну</option>
+                                <option value="wind-howling">Вой ветра</option>
+                                <option value="crowd-chatter">Шум толпы/Базар</option>
+                                <option value="silence">Полная тишина</option>
+                                <option value="8bit-music">8-битная музыка (Ретро-игры)</option>
+                                <option value="vocal-trance">Вокальный транс</option>
+                                <option value="orchestral-strings">Оркестровые струнные (Драматические)</option>
+                                <option value="acoustic-guitar">Акустическая гитара (Мягкая)</option>
+                                <option value="heavy-metal">Тяжелый металл (Гитары, Барабаны)</option>
+                                <option value="symphony">Симфонический оркестр</option>
+                                <option value="synth-pop">Синт-поп (80-е)</option>
+                                <option value="techno">Техно (Ритмичный бит)</option>
+                                <option value="whispers">Шепот</option>
+                                <option value="explosions">Звук взрывов</option>
+                                <option value="car-engine">Рев двигателя</option>
+                                <option value="birds-chirping">Пение птиц</option>
+                                <option value="ocean-waves">Шум океанских волн</option>
+                                <option value="dubstep">Дабстеп (Wobble Bass)</option>
+                                <option value="folk">Фолк (Банжо, Скрипка)</option>
+                                <option value="gospel">Госпел (Хор, Орган)</option>
+                                <option value="reggae">Регги (Офф-бит)</option>
+                                <option value="opera">Оперный вокал</option>
+                                <option value="medieval-lute">Средневековая лютня</option>
+                                <option value="sci-fi-bleeps">Научно-фантастические звуки</option>
+                                <option value="western-whistle">Свист в стиле Вестерн</option>
+                                <option value="trap-beat">Трэп-бит (Хай-хэты)</option>
+                                <option value="k-pop">К-поп (Синтезаторы, Вокал)</option>
+                                <option value="japanese-flute">Японская флейта (Шакухати)</option>
+                                <option value="sitar">Ситар (Индийская музыка)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Parameters Section -->
+
+                <!-- Details Section -->
+                <div class="mt-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xl font-semibold text-gray-800">5. Дополнительные детали (Теги):</h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-details" class="toggle-checkbox hidden" checked>
+                            <span class="toggle-label"></span>
+                        </label>
+                    </div>
+                    <div class="param-content">
+                        <textarea id="details-textarea" class="w-full min-h-[100px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Введите дополнительные теги через запятую, например: 8K, Hyperrealism, Volumetric Lighting"></textarea>
+                            <div class="mt-3 flex gap-2">
+                                <button id="suggest-tags-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 transition-all duration-200">
+                                    🤖 Подобрать теги
+                                </button>
+                            </div>
+                        
+                        <div class="mt-4">
+                            <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block">Качество и Рендеринг:</span>
+                            <div class="flex flex-wrap gap-2 mt-1" id="quick-tags-quality">
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="8K">8K</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="4K">4K</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Hyperrealism">Гиперреализм</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Photorealistic">Фотореализм</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Unreal Engine 5">Unreal Engine 5</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Octane Render">Octane Render</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="V-Ray">V-Ray</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Ray Tracing">Ray Tracing</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="60fps">60fps</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="120fps">120fps</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="HDR">HDR</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Subsurface Scattering">Subsurface Scattering</span>
+                            </div>
+                            
+                            <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block">Атмосфера и Эффекты:</span>
+                            <div class="flex flex-wrap gap-2 mt-1" id="quick-tags-atmosphere">
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Volumetric Lighting">Объемный свет</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Cinematic Grain">Кинозерно</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Depth of Field">Глубина резкости</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Bokeh">Боке</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Rain">Дождь</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Snow">Снег</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Fog">Туман</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Dust Particles">Частицы пыли</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Neon Glow">Неоновое свечение</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="VFX">VFX</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Chromatic Aberration">Хроматическая аберрация</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Lens Flare">Блик</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Details Section -->
+
+                <!-- Negative Prompt Section -->
+                <div class="mt-8 p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xl font-semibold text-red-800">6. Негативный Промпт (Что исключить):</h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-negative" class="toggle-checkbox hidden" checked>
+                            <span class="toggle-label bg-red-500"></span>
+                        </label>
+                    </div>
+                    <div class="param-content">
+                        
+                            <div class="mb-4">
+                                <label for="anti-prompt-input" class="block text-sm font-medium text-gray-700 mb-2">Что вы НЕ хотите видеть? (Опишите простыми словами)</label>
+                                <textarea id="anti-prompt-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Например: не хочу мультяшность, кривые руки, водяные знаки"></textarea>
+                            </div><textarea id="negative-prompt-textarea" class="w-full min-h-[100px] p-4 border border-red-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" placeholder="Введите теги, которые нужно исключить, например: low quality, blurry, watermark"></textarea>
+                            <div class="mt-3 flex gap-2">
+                                <button id="generate-negative-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-red-600 hover:to-orange-600 transition-all duration-200">
+                                    🤖 Сгенерировать негатив
+                                </button>
+                                <button id="predict-problems-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-semibold rounded-lg shadow-md hover:from-gray-700 hover:to-gray-800 transition-all duration-200">
+                                    🤖 Предсказать проблемы
+                                </button>
+                            </div>
+                        
+                        <div class="mt-4">
+                            <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block text-red-700">Быстрые негативные теги:</span>
+                            <div class="flex flex-wrap gap-2 mt-1" id="negative-tags-container">
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="low quality">Низкое качество</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="blurry">Размытость</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="watermark">Водяной знак</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="text">Текст</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="bad anatomy">Плохая анатомия</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="noise">Шум</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="artifacts">Артефакты</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="ugly">Уродливый</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="disfigured">Изуродованный</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="oversaturated">Перенасыщенный</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="monochrome">Монохромный</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="cartoon">Мультяшный</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="cropped">Обрезанный</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="duplicate">Дубликат</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Negative Prompt Section -->
+
+                <!-- Control Buttons -->
+                <div class="mt-8 flex flex-wrap gap-3 justify-center">
+                    <button id="reset-params-btn" class="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-all duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Сбросить параметры
+                    </button>
+                    <button id="random-prompt-btn" class="px-6 py-3 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-all duration-200 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        Мне повезет!
+                    </button>
+                </div>
+                <!-- End Control Buttons -->
+
+                <!-- Result Section -->
+                <div id="result-section" class="mt-12 p-6 bg-white rounded-xl shadow-2xl hidden">
+                    <h3 class="text-2xl font-bold mb-4 text-blue-600">7. Готовый Промпт:</h3>
+                    <textarea id="prompt-output" readonly class="w-full min-h-[300px] p-4 border-2 border-blue-300 rounded-lg text-base bg-gray-50 font-mono resize-none"></textarea>
+                    <!-- Prompt Quality Score Panel -->
+                    <div id="quality-panel" class="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-lg hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">📊 Оценка качества промпта</h3>
+                        <div class="flex items-center mb-4">
+                            <div class="flex-1">
+                                <div class="w-full bg-gray-200 rounded-full h-4">
+                                    <div id="quality-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span id="quality-score" class="ml-4 text-3xl font-bold text-green-600">0</span>
+                        </div>
+                        <div id="quality-feedback" class="text-sm text-gray-700 space-y-2">
+                            <!-- Feedback will be inserted here -->
+                        </div>
+                    </div>
+                    <!-- Storyboard Preview Panel -->
+                    <div id="storyboard-panel" class="mt-6 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-lg hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">🎬 Превью сториборда</h3>
+                        <div id="storyboard-scenes" class="space-y-3">
+                            <!-- Scenes will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3 mt-4">
+                        <button id="copy-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-7 4l-3 3m0 0l3 3m-3-3h10"></path></svg>
+                            Копировать
+                        </button>
+                        <button id="edit-btn" class="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition-all duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            Редактировать
+                        </button>
+                        <button id="regenerate-btn" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition-all duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Перегенерировать
+                        </button>
+                        <button id="export-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Экспорт (.txt)
+                        </button>
+                    </div>
+                </div>
+                <!-- End Result Section -->
+
+            </div>
+        </section>
+    </main>
+
+    <div id="notification-container" class="fixed bottom-4 right-4 z-50 flex flex-col items-end space-y-2">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const STORAGE_KEY = 'aiPromptCreatorStateV9';
+            let undoState = null; // Для функции "Отменить сброс"
+
+            // --- Элементы DOM ---
+            const ideaInput = document.getElementById('idea-input');
+            const improveBtn = document.getElementById('improve-btn');
+            const superImproveBtn = document.getElementById('super-improve-btn');
+            const resetParamsBtn = document.getElementById('reset-params-btn');
+            const randomPromptBtn = document.getElementById('random-prompt-btn');
+            const promptOutput = document.getElementById('prompt-output');
+            const copyBtn = document.getElementById('copy-btn');
+            const editBtn = document.getElementById('edit-btn');
+            const regenerateBtn = document.getElementById('regenerate-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const resultSection = document.getElementById('result-section');
+            const notificationContainer = document.getElementById('notification-container');
+            const durationSlider = document.getElementById('duration-slider');
+            const durationValue = document.getElementById('duration-value');
+            const durationButtons = document.querySelectorAll('.duration-btn');
+            const customDurationToggle = document.getElementById('custom-duration-toggle');
+            const customDurationSliderGroup = document.getElementById('custom-duration-slider-group');
+            const modelRadios = document.querySelectorAll('input[name="model"]');
+            const enableModelSelectionCheckbox = document.getElementById('enable-model-selection');
+            const modelSelectionContainer = document.getElementById('model-selection-container');
+            const audioGroup = document.getElementById('audio-group');
+            const styleSelect = document.getElementById('style');
+            const animeOptionsGroup = document.getElementById('anime-options-group');
+            const animeStudioSelect = document.getElementById('anime-studio');
+            const animeStyleSelect = document.getElementById('anime-style');
+            const animeMangaInput = document.getElementById('anime-manga-input');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            const detailsTextarea = document.getElementById('details-textarea');
+            const negativePromptTextarea = document.getElementById('negative-prompt-textarea');
+            const quickTagContainers = document.querySelectorAll('#quick-tags-quality, #quick-tags-atmosphere');
+            const negativeTagContainer = document.getElementById('negative-tags-container');
+            const toggleCheckboxes = document.querySelectorAll('.toggle-checkbox');
+            const parameterGroups = document.querySelectorAll('.parameter-group');
+
+            // --- Расширенные карты параметров ---
+            const styleMap = {
+                'realistic': 'Реалистичный (Photorealistic)',
+                'animation-3d': '3D Анимация (Pixar/Disney)',
+                'anime': 'Аниме (Японская анимация)',
+                'abstract': 'Абстрактный',
+                'documentary': 'Документальный',
+                'stop-motion': 'Стоп-моушн',
+                'surreal': 'Сюрреалистичный',
+                'fantasy': 'Фэнтези (Высокое)',
+                'futuristic': 'Футуристический (Sci-Fi)',
+                'oil-painting': 'Масляная живопись',
+                'watercolor': 'Акварель',
+                'low-poly': 'Low Poly (3D)',
+                'voxel': 'Voxel (Minecraft Style)',
+                'pixel-art': 'Пиксель-арт (8-bit)',
+                'comic-book': 'Комикс (Стиль Marvel/DC)',
+                'noir': 'Нуар (Черно-белый, Драматический)',
+                'steampunk': 'Стимпанк',
+                'cyberpunk': 'Киберпанк',
+                'minimalist': 'Минималистичный',
+                'hyperrealism': 'Гиперреализм',
+                'cinematic': 'Кинематографический',
+                'vintage': 'Винтажный (50s/60s)',
+                'glitch-art': 'Глитч-арт',
+                'grunge': 'Гранж',
+                'sketch': 'Карандашный набросок',
+                'pop-art': 'Поп-арт (Стиль Энди Уорхола)',
+                'impressionism': 'Импрессионизм',
+                'expressionism': 'Экспрессионизм',
+                'photogrammetry': 'Фотограмметрия',
+                'tilt-shift': 'Тилт-шифт (Миниатюра)',
+                'claymation': 'Пластилиновая анимация',
+                'rotoscoping': 'Ротоскопирование',
+            };
+
+            const cameraMap = {
+                'medium-shot': 'Средний план (Medium Shot)',
+                'wide-shot': 'Широкий план (Wide Shot)',
+                'close-up': 'Крупный план (Close-Up)',
+                'extreme-close-up': 'Экстремально крупный план',
+                'long-shot': 'Дальний план (Long Shot)',
+                'establishing-shot': 'Установочный план (Establishing Shot)',
+                'dutch-angle': 'Голландский угол (Dutch Angle)',
+                'low-angle': 'Нижний ракурс (Low Angle)',
+                'high-angle': 'Верхний ракурс (High Angle)',
+                'overhead-shot': 'Съемка сверху (Overhead/Drone)',
+                'tracking': 'Следящая камера (Tracking Shot)',
+                'dolly-zoom': 'Транстрав (Dolly Zoom/Vertigo Effect)',
+                'pan-left': 'Панорамирование влево',
+                'pan-right': 'Панорамирование вправо',
+                'tilt-up': 'Наклон вверх',
+                'tilt-down': 'Наклон вниз',
+                'crane-shot': 'Съемка с крана (Crane Shot)',
+                'handheld': 'Ручная камера (Handheld, Дрожание)',
+                'steadicam': 'Стедикам (Плавное движение)',
+                'point-of-view': 'От первого лица (POV)',
+                'reverse-shot': 'Обратный кадр',
+                'arc-shot': 'Вращение вокруг объекта (Arc Shot)',
+                'zoom-in': 'Быстрое приближение (Zoom In)',
+                'zoom-out': 'Быстрое отдаление (Zoom Out)',
+                'slow-motion': 'Замедленная съемка (Slow Motion)',
+                'time-lapse': 'Таймлапс (Ускоренная съемка)',
+                'bullet-time': 'Эффект "Матрицы" (Bullet Time)',
+                'macro-shot': 'Макро-съемка',
+                'micro-shot': 'Микро-съемка (Под микроскопом)',
+                'gimbal-shot': 'Съемка с гимбала (Идеально плавно)',
+                'whip-pan': 'Резкий переход (Whip Pan)',
+                'rack-focus': 'Перевод фокуса (Rack Focus)',
+            };
+
+            const lightingMap = {
+                'natural': 'Естественное (Natural Light)',
+                'cinematic': 'Кинематографическое (Dramatic)',
+                'neon': 'Неоновое (Neon Glow)',
+                'backlight': 'Контровое (Backlight)',
+                'soft': 'Мягкое (Soft Lighting)',
+                'hard': 'Жесткое (Hard Lighting, Резкие тени)',
+                'low-key': 'Низкий ключ (Low-Key, Много теней)',
+                'high-key': 'Высокий ключ (High-Key, Яркое, Без теней)',
+                'volumetric': 'Объемный свет (Volumetric Lighting/God Rays)',
+                'rim-light': 'Контурный свет (Rim Light)',
+                'studio-light': 'Студийное (Studio Lighting)',
+                'candlelight': 'Свечи (Теплое, Мерцающее)',
+                'fluorescent': 'Флуоресцентное (Холодное, Лампы)',
+                'strobe': 'Стробоскоп (Strobe Light)',
+                'magic-glow': 'Волшебное свечение (Magic Glow)',
+                'sunset': 'Закатное (Golden Hour)',
+                'moonlight': 'Лунное (Холодное, Синее)',
+                'underwater': 'Подводное (Зеленоватое)',
+                'firelight': 'Свет костра (Оранжевое)',
+                'street-lamp': 'Уличный фонарь (Желтое)',
+                'spotlight': 'Прожектор (Spotlight)',
+                'fill-light': 'Заполняющий свет (Fill Light)',
+                'practical-light': 'Практический свет (Лампы в кадре)',
+                'ambient-occlusion': 'Ambient Occlusion (Мягкие тени)',
+                'ray-tracing': 'Ray Tracing (Реалистичные отражения)',
+                'chromatic-aberration': 'Хроматическая аберрация',
+                'flare': 'Блик (Lens Flare)',
+                'two-tone': 'Двухцветное (Two-Tone Lighting)',
+                'dramatic': 'Драматическое (Chiaroscuro)',
+                'silhouetted': 'Силуэтное (Silhouetted)',
+                'foggy': 'Туманное (Foggy)',
+                'rainy': 'Дождливое (Wet Surfaces)',
+            };
+
+            const moodMap = {
+                'epic': 'Эпическое (Epic)',
+                'joyful': 'Радостное (Joyful)',
+                'tense': 'Напряженное (Tense)',
+                'calm': 'Спокойное (Calm)',
+                'nostalgic': 'Ностальгическое (Nostalgic)',
+                'magical': 'Волшебное (Magical)',
+                'dystopian': 'Дистопическое (Dystopian)',
+                'whimsical': 'Причудливое (Whimsical)',
+                'melancholic': 'Меланхоличное (Melancholic)',
+                'ominous': 'Зловещее (Ominous)',
+                'ethereal': 'Эфирное (Ethereal)',
+                'surreal': 'Сюрреалистическое (Surreal)',
+                'romantic': 'Романтическое (Romantic)',
+                'horror': 'Ужас (Horror)',
+                'action': 'Экшн (Action-Packed)',
+                'peaceful': 'Мирное (Peaceful)',
+                'mysterious': 'Таинственное (Mysterious)',
+                'dramatic': 'Драматическое (Dramatic)',
+                'gloomy': 'Мрачное (Gloomy)',
+                'hopeful': 'Обнадеживающее (Hopeful)',
+                'isolated': 'Изолированное (Isolated)',
+                'energetic': 'Энергичное (Energetic)',
+                'dreamlike': 'Сонное (Dreamlike)',
+                'chaotic': 'Хаотичное (Chaotic)',
+                'suspenseful': 'Напряженное (Suspenseful)',
+                'spiritual': 'Духовное (Spiritual)',
+                'futuristic': 'Футуристическое (Futuristic)',
+                'historical': 'Историческое (Historical)',
+                'meditative': 'Медитативное (Meditative)',
+                'silly': 'Глупое (Silly)',
+                'intense': 'Интенсивное (Intense)',
+                'warm': 'Теплое (Warm)',
+            };
+
+            const cinematographyMap = {
+                '16:9': '16:9 (Стандарт HD, YouTube)',
+                '21:9': '21:9 (Широкоэкранный, Cinematic)',
+                '4:3': '4:3 (Винтаж, Ретро)',
+                '1:1': '1:1 (Квадрат, Instagram)',
+                '9:16': '9:16 (Вертикальный, Reels/TikTok)',
+                '2.35:1': '2.35:1 (Ultra Panavision)',
+                '1.85:1': '1.85:1 (Американский стандарт)',
+                '2.76:1': '2.76:1 (Ben-Hur)',
+                'anamorphic': 'Анаморфный объектив',
+                'spherical': 'Сферический объектив',
+                'fisheye': 'Рыбий глаз',
+                'macro': 'Макро объектив',
+                'telephoto': 'Телеобъектив',
+                'wide-angle': 'Широкоугольный объектив',
+                'prime-lens': 'Фикс-объектив',
+                'zoom-lens': 'Зум-объектив',
+                'vintage-lens': 'Винтажный объектив',
+                'low-depth': 'Малая глубина резкости',
+                'deep-depth': 'Большая глубина резкости',
+                'bokeh': 'Боке',
+                'film-grain': 'Пленка (Film Grain)',
+                'digital-clean': 'Цифровое (Digital Clean)',
+                'vhs-tape': 'VHS-пленка',
+                'super-8': 'Super 8mm Film',
+                '16mm': '16mm Film',
+                '35mm': '35mm Film',
+                'imax': 'IMAX Format',
+                'technicolor': 'Техниколор',
+                'sepia': 'Сепия',
+                'monochrome': 'Монохромный',
+                'hdr': 'HDR',
+                'sdr': 'SDR',
+            };
+
+            const effectMap = {
+                'none': 'Без эффектов',
+                'film-grain': 'Зернистость пленки (Film Grain)',
+                'glitch': 'Глитч (Glitch Effect)',
+                'depth-of-field': 'Глубина резкости (Depth of Field)',
+                'smoke-fog': 'Дым/Туман (Smoke/Fog)',
+                'vhs': 'Эффект VHS',
+                'god-rays': 'Лучи света (God Rays)',
+                'chromatic-aberration': 'Хроматическая аберрация',
+                'lens-flare': 'Блик объектива (Lens Flare)',
+                'particles': 'Частицы (Particles, Пыль, Искры)',
+                'time-lapse': 'Таймлапс (Time-Lapse)',
+                'slow-motion': 'Замедленная съемка (Slow Motion)',
+                'bullet-time': 'Эффект "Матрицы" (Bullet Time)',
+                'stop-motion': 'Стоп-моушн (Stop Motion)',
+                'tilt-shift': 'Тилт-шифт (Tilt-Shift)',
+                'motion-blur': 'Размытие движения (Motion Blur)',
+                'double-exposure': 'Двойная экспозиция',
+                'anamorphic-flare': 'Анаморфный блик',
+                'rain': 'Дождь (Rain)',
+                'snow': 'Снег (Snow)',
+                'fire': 'Огонь (Fire)',
+                'water-splash': 'Брызги воды (Water Splash)',
+                'electric-sparks': 'Электрические искры',
+                'hologram': 'Голограмма (Hologram)',
+                'neon-lines': 'Неоновые линии (Neon Lines)',
+                'scanlines': 'Сканлайны (Scanlines)',
+                'pixelation': 'Пикселизация',
+                'distortion': 'Искажение (Distortion)',
+                'vignette': 'Виньетка (Vignette)',
+                'color-grading': 'Цветокоррекция (Specific Color Grade)',
+                'noise': 'Шум (Noise)',
+                'bloom': 'Свечение (Bloom)',
+            };
+
+            const photoAnimationMap = {
+                'none': 'Без анимации',
+                'parallax-zoom': 'Параллакс с зумом (Parallax Zoom Effect)',
+                'ken-burns': 'Эффект Кена Бернса (Ken Burns Effect - Slow Pan & Zoom)',
+                'cinemagraph': 'Синемаграф (Cinemagraph - Partial Motion)',
+                'morph-transition': 'Морфинг переход (Morphing Transition)',
+                '3d-rotation': 'Трехмерное вращение (3D Rotation)',
+                'depth-parallax': 'Глубинный параллакс (Depth-Based Parallax)',
+                'camera-push-in': 'Наезд камеры (Camera Push In)',
+                'camera-pull-out': 'Отъезд камеры (Camera Pull Out)',
+                'dolly-zoom': 'Долли-зум (Dolly Zoom / Vertigo Effect)',
+                'slow-pan-left': 'Медленный пан влево (Slow Pan Left)',
+                'slow-pan-right': 'Медленный пан вправо (Slow Pan Right)',
+                'slow-tilt-up': 'Медленный наклон вверх (Slow Tilt Up)',
+                'slow-tilt-down': 'Медленный наклон вниз (Slow Tilt Down)',
+                'orbit-rotation': 'Орбитальное вращение (Orbit Rotation)',
+                'reveal-wipe': 'Проявление с вытиранием (Reveal Wipe)',
+                'glitch-transition': 'Глитч-переход (Glitch Transition)',
+                'pixel-sort': 'Пиксельная сортировка (Pixel Sort Animation)',
+                'datamosh': 'Датамош (Datamosh Effect)',
+                'chromatic-split': 'Хроматическое разделение (Chromatic Split)',
+                'liquid-morph': 'Жидкостный морфинг (Liquid Morph)',
+                'particle-dispersion': 'Рассеивание частиц (Particle Dispersion)',
+                'freeze-frame-highlight': 'Стоп-кадр с подсветкой (Freeze Frame Highlight)',
+                'time-slice': 'Временной срез (Time Slice / Bullet Time)',
+                'seamless-loop': 'Бесшовный луп (Seamless Loop)',
+                'boomerang': 'Бумеранг (Boomerang - Forward & Reverse)',
+                'speed-ramp': 'Изменение скорости (Speed Ramp)',
+                'hyper-lapse': 'Гиперлапс (Hyper-Lapse)',
+                'stop-motion-style': 'Стиль стоп-мошн (Stop Motion Style)',
+                '2.5d-parallax': '2.5D параллакс (2.5D Parallax)',
+                'depth-of-field-shift': 'Смещение глубины резкости (Depth of Field Shift)',
+                'animated-painting': 'Анимированная живопись (Animated Painting Effect)',
+            };
+
+            const backgroundMap = {
+                'urban-city': 'Городской пейзаж (Urban City)',
+                'nature-forest': 'Лес (Forest)',
+                'cyberpunk-street': 'Киберпанк улица (Neon, Rain)',
+                'abstract-geometric': 'Абстрактный/Геометрический',
+                'beach-ocean': 'Пляж/Океан',
+                'mountain-range': 'Горный хребет',
+                'desert': 'Пустыня (Desert)',
+                'space': 'Космос (Space, Stars)',
+                'historical-castle': 'Исторический замок',
+                'ancient-ruins': 'Древние руины',
+                'laboratory': 'Секретная лаборатория',
+                'medieval-village': 'Средневековая деревня',
+                'post-apocalyptic-wasteland': 'Постапокалиптическая пустошь',
+                'floating-island': 'Парящий остров (Фэнтези)',
+                'volcano': 'Активный вулкан',
+                'train-station': 'Старый вокзал',
+                'abandoned-factory': 'Заброшенный завод',
+                'rooftop-city': 'Крыша небоскреба (Ночь)',
+                'japanese-garden': 'Японский сад',
+                'wild-west': 'Дикий Запад',
+                'deep-sea-trench': 'Глубоководный желоб',
+                'alien-planet': 'Чужая планета',
+                'library': 'Старинная библиотека',
+                'hospital-corridor': 'Больничный коридор',
+                'concert-stage': 'Концертная сцена',
+                'classroom': 'Школьный класс',
+                'art-gallery': 'Художественная галерея',
+                'suburban-street': 'Пригородная улица',
+                'futuristic-city': 'Футуристический город',
+                'underground-bunker': 'Подземный бункер',
+                'swamp': 'Болото',
+                'canyon': 'Каньон',
+                'ice-cave': 'Ледяная пещера',
+                'space-station': 'Космическая станция',
+                'pirate-ship': 'Пиратский корабль',
+                'fairytale-forest': 'Сказочный лес',
+                'olympic-stadium': 'Олимпийский стадион',
+                'deserted-highway': 'Заброшенное шоссе',
+                'rainy-alley': 'Дождливый переулок',
+            };
+            
+            const audioMap = {
+                'none': 'без звука',
+                'epic-music': 'с эпичной оркестровой музыкой',
+                'synthwave-music': 'с музыкой в стиле Синтвейв/Ретро',
+                'lo-fi-music': 'с музыкой в стиле Lo-fi/Спокойной',
+                'nature-sounds': 'с иммерсивными звуками природы (ветер, дождь)',
+                'voiceover': 'с глубоким, спокойным голосом за кадром (voiceover)',
+                'sound-effects': 'со звуковыми эффектами (взрывы, шаги, скрежет)',
+                'ambient': 'с атмосферным эмбиентом',
+                'rock': 'с энергичным рок/метал',
+                'jazz': 'Джаз (Саксофон, Ночной клуб)',
+                'classical': 'Классическая музыка (Фортепиано, Струнные)',
+                'hip-hop': 'Хип-хоп (Бит, Бас)',
+                'electronic-trance': 'Электронная музыка (Транс, Драйв)',
+                'horror-score': 'Хоррор-саундтрек (Дисонанс, Скрипки)',
+                'cinematic-boom': 'Кинематографический БУМ (Низкий бас)',
+                'footsteps': 'Звук шагов (По асфальту/Снегу)',
+                'rain-on-window': 'Звук дождя по окну',
+                'wind-howling': 'Вой ветра',
+                'crowd-chatter': 'Шум толпы/Базар',
+                'silence': 'Полная тишина',
+                '8bit-music': '8-битная музыка (Ретро-игры)',
+                'vocal-trance': 'Вокальный транс',
+                'orchestral-strings': 'Оркестровые струнные (Драматические)',
+                'acoustic-guitar': 'Акустическая гитара (Мягкая)',
+                'heavy-metal': 'Тяжелый металл (Гитары, Барабаны)',
+                'symphony': 'Симфонический оркестр',
+                'synth-pop': 'Синт-поп (80-е)',
+                'techno': 'Техно (Ритмичный бит)',
+                'whispers': 'Шепот',
+                'explosions': 'Звук взрывов',
+                'car-engine': 'Рев двигателя',
+                'birds-chirping': 'Пение птиц',
+                'ocean-waves': 'Шум океанских волн',
+                'dubstep': 'Дабстеп (Wobble Bass)',
+                'folk': 'Фолк (Банжо, Скрипка)',
+                'gospel': 'Госпел (Хор, Орган)',
+                'reggae': 'Регги (Офф-бит)',
+                'opera': 'Оперный вокал',
+                'medieval-lute': 'Средневековая лютня',
+                'sci-fi-bleeps': 'Научно-фантастические звуки',
+                'western-whistle': 'Свист в стиле Вестерн',
+                'trap-beat': 'Трэп-бит (Хай-хэты)',
+                'k-pop': 'К-поп (Синтезаторы, Вокал)',
+                'japanese-flute': 'Японская флейта (Шакухати)',
+                'sitar': 'Ситар (Индийская музыка)'
+            };
+
+            const animeStudioMap = {
+                'Studio Ghibli': 'Студия Ghibli (Стиль Хаяо Миядзаки, мягкие цвета, детализированная природа)',
+                'Makoto Shinkai': 'Макото Синкай (Гиперреалистичные фоны, эмоциональный свет, "Твое имя")',
+                'Kyoto Animation': 'Kyoto Animation (KyoAni) (Плавная анимация, милые персонажи)',
+                'MAPPA': 'MAPPA (Динамика, Жесткий стиль, "Атака Титанов", "Магическая битва")',
+                'Ufotable': 'Ufotable (Эффекты, CGI, "Клинок, рассекающий демонов")',
+                'Production I.G': 'Production I.G (Научная фантастика, "Призрак в доспехах")',
+                'Osamu Tezuka': 'Осаму Тэдзука (Классика, "Астробой")',
+                'Satoshi Kon': 'Сатоси Кон (Сюрреализм, "Паприка")',
+                'Katsuhiro Otomo': 'Кацухиро Отомо (Детализированная механика, "Акира")',
+                'Science SARU': 'Science SARU (Уникальный, экспериментальный стиль)',
+                'Toei Animation': 'Toei Animation (Длинные сериалы, "Ван-Пис")',
+                'Gainax': 'Gainax (Эмоциональность, "Евангелион")',
+                'Trigger': 'Trigger (Динамика, Экшн, "Килл ла Килл")',
+                'Bones': 'Bones (Экшн, "Моя геройская академия")',
+                'Madhouse': 'Madhouse (Разнообразие жанров, "Тетрадь смерти")',
+                'Tatsunoko Production': 'Tatsunoko Production (Ретро)',
+                'Sunrise': 'Sunrise (Меха, Гандам)',
+                'Pierrot': 'Pierrot (Наруто, Блич)',
+                'A-1 Pictures': 'A-1 Pictures (Sword Art Online)',
+                'Wit Studio': 'Wit Studio (Атака Титанов)',
+                'CloverWorks': 'CloverWorks (Spy x Family)',
+                'David Production': 'David Production (JoJo)',
+                'TMS Entertainment': 'TMS Entertainment (Детектив Конан)',
+                'P.A. Works': 'P.A. Works (Красивые фоны)',
+                'Shaft': 'Shaft (Стиль "Моногатари")',
+                'CoMix Wave Films': 'CoMix Wave Films (Синкай)',
+                'Studio 4°C': 'Studio 4°C (Экспериментальное)',
+                'Khara': 'Khara (Евангелион)',
+                'Orange': 'Orange (3D CGI)',
+            };
+
+            const animeStyleMap = {
+                'Manga Style': 'Стиль Манги (Черно-белый, Штриховка, Высокий контраст)',
+                'Cel Shading': 'Сел-шейдинг (Яркие цвета, Плоские тени, Четкие контуры)',
+                'Digital Painting': 'Цифровая живопись (Мягкие переходы, Реалистичные тени)',
+                'Traditional Hand-Drawn': 'Традиционная ручная рисовка (Теплые цвета, Классика)',
+                'Chibi/SD': 'Чиби/SD (Милый, Маленький, Увеличенная голова)',
+                'Mecha/Gundam': 'Меха/Гандам (Роботы, Детализированная техника)',
+                'Moé': 'Моэ (Милый, Нежный, Большие глаза)',
+                'Retro 90s Anime': 'Ретро Аниме 90-х (Толстые линии, Яркие цвета, Зерно)',
+                'Ukiyo-e': 'Укиё-э (Японская гравюра, Плоские цвета, Волнообразные линии)',
+                'Super Deformed': 'Супер Деформированный (Комический, Преувеличенный)',
+                'Shoujo Manga': 'Стиль Сёдзё Манги (Цветы, Блеск, Эмоциональность)',
+                'Shonen Manga': 'Стиль Сёнэн Манги (Динамика, Экшн, Сильные линии)',
+                'Gekiga': 'Гэкига (Драматический, Реалистичный, Взрослый)',
+                'Ink Wash': 'Тушь (Суми-э)',
+                'Watercolor Backgrounds': 'Акварельные фоны',
+                'Line Art': 'Чистый лайн-арт',
+                'Thick Lines': 'Толстые контуры (Стиль Mob Psycho)',
+                'Thin Lines': 'Тонкие контуры (Стиль KyoAni)',
+                'Minimalist': 'Минималистичный',
+                'High Contrast': 'Высокий контраст (Стиль JoJo)',
+                'Pastel Colors': 'Пастельные цвета',
+                'Vibrant Colors': 'Яркие, насыщенные цвета',
+                'Monochromatic': 'Монохромный',
+            };
+
+            const presets = {
+                'cinematic-epic': {
+                    style: 'realistic', camera: 'wide-shot', lighting: 'cinematic', cinematography: '21:9', mood: 'epic', effect: 'film-grain', background: 'nature-forest', audio: 'epic-music', details: '8K, Hyperrealism, Volumetric Lighting, Cinematic Grain, Epic Scale', negative: 'low quality, blurry, artifacts, watermark'
+                },
+                'cyberpunk-neon': {
+                    style: 'futuristic', camera: 'dutch-angle', lighting: 'neon', cinematography: '16:9', mood: 'tense', effect: 'glitch', background: 'cyberpunk-street', audio: 'synthwave-music', details: 'High contrast, Rain, Wet Ground, Glitch Effect, Neon reflections, Ray Tracing', negative: 'low quality, blurry, text, bad anatomy, warm colors'
+                },
+                'pixar-animation': {
+                    style: 'animation-3d', camera: 'medium-shot', lighting: 'soft', cinematography: '16:9', mood: 'joyful', effect: 'depth-of-field', background: 'abstract-geometric', audio: 'lo-fi-music', details: 'Bright colors, Smooth movement, Cartoon style, Depth of Field, 60fps, Subsurface Scattering', negative: 'realistic, film grain, dark, scary, noise'
+                },
+                'documentary-nature': {
+                    style: 'documentary', camera: 'tracking', lighting: 'natural', cinematography: '16:9', mood: 'calm', effect: 'none', background: 'nature-forest', audio: 'nature-sounds', details: 'Handheld camera, Shallow depth of field, Photorealistic, 60fps, 8K, High Dynamic Range', negative: 'vfx, stylized, cartoon, low quality, distortion'
+                },
+                'low-key-noir': {
+                    style: 'noir', camera: 'low-angle', lighting: 'low-key', cinematography: '2.35:1', mood: 'gloomy', effect: 'smoke-fog', background: 'rainy-alley', audio: 'jazz', details: 'Black and white, High contrast, Hard shadows, Film Noir style, Wet surfaces', negative: 'color, high key, bright, happy, soft lighting'
+                },
+                'vintage-vhs': {
+                    style: 'vintage', camera: 'pan-left', lighting: 'backlight', cinematography: '4:3', mood: 'nostalgic', effect: 'vhs', background: 'suburban-street', audio: 'synth-pop', details: 'VHS effect, Tracking lines, Low resolution, Grainy, 80s aesthetic, Scanlines', negative: 'high quality, 4k, clean, modern, sharp'
+                },
+                'fantasy-magic': {
+                    style: 'fantasy', camera: 'crane-shot', lighting: 'magic-glow', cinematography: '21:9', mood: 'magical', effect: 'god-rays', background: 'historical-castle', audio: 'orchestral-strings', details: 'Magic particles, God Rays, High fantasy, Detailed armor, Unreal Engine 5, Bloom', negative: 'low quality, modern, sci-fi, blurry, noise'
+                },
+                'wes-anderson': {
+                    style: 'stop-motion', camera: 'medium-shot', lighting: 'soft', cinematography: '4:3', mood: 'whimsical', effect: 'tilt-shift', background: 'medieval-village', audio: 'folk', details: 'Symmetry, Pastel colors, Flat composition, Stop motion animation, Tilt-Shift, Soft Lighting', negative: 'dark, realistic, high contrast, glitch, aggressive'
+                },
+                'post-apocalypse': {
+                    style: 'realistic', camera: 'handheld', lighting: 'dramatic', cinematography: '16:9', mood: 'dystopian', effect: 'smoke-fog', background: 'post-apocalyptic-wasteland', audio: 'ambient', details: 'Dust, Ruined city, Handheld camera, Cinematic grain, HDR, Low Exposure', negative: 'clean, bright, joyful, low quality, vibrant colors'
+                },
+                'anime-ghibli': {
+                    style: 'anime', camera: 'tracking', lighting: 'soft', cinematography: '16:9', mood: 'peaceful', effect: 'none', background: 'japanese-garden', audio: 'japanese-flute', details: 'Studio Ghibli style, Traditional Hand-Drawn, Warm colors, Detailed nature, Soft Lighting', negative: 'low quality, glitch, hard shadows, mecha',
+                    studio: 'Studio Ghibli', animeStyle: 'Traditional Hand-Drawn'
+                },
+                'manga-style': {
+                    style: 'anime', camera: 'close-up', lighting: 'low-key', cinematography: '4:3', mood: 'tense', effect: 'film-grain', background: 'classroom', audio: 'silence', details: 'Manga Style, Black and white, High contrast, Shonen Manga style, Ink lines', negative: 'color, soft lighting, blur, low quality',
+                    animeStyle: 'Manga Style'
+                }
+            };
+            // --- Конец расширенных карт параметров ---
+
+            // --- Вспомогательные функции ---
+
+            function getRandomKey(map) {
+                const keys = Object.keys(map);
+                return keys[Math.floor(Math.random() * keys.length)];
+            }
+
+            function toggleAudioSelector() {
+                const isModelSelectionEnabled = enableModelSelectionCheckbox.checked;
+                
+                if (!isModelSelectionEnabled) {
+                    // Если выбор модели отключен, показываем все функции
+                    audioGroup.style.display = 'block';
+                } else {
+                    // Если выбор модели включен, проверяем выбранную модель
+                    const selectedModel = document.querySelector('input[name="model"]:checked').value;
+                    if (selectedModel === 'veo') {
+                        audioGroup.style.display = 'block';
+                    } else {
+                        audioGroup.style.display = 'none';
+                    }
+                }
+                saveState();
+            }
+            
+            function toggleModelSelection() {
+                const isEnabled = enableModelSelectionCheckbox.checked;
+                
+                if (isEnabled) {
+                    modelSelectionContainer.style.display = 'grid';
+                } else {
+                    modelSelectionContainer.style.display = 'none';
+                }
+                
+                toggleAudioSelector();
+                saveState();
+            }
+
+            function toggleAnimeOptions() {
+                if (styleSelect.value === 'anime') {
+                    animeOptionsGroup.classList.remove('hidden');
+                } else {
+                    animeOptionsGroup.classList.add('hidden');
+                }
+                saveState();
+            }
+
+            function toggleParameterGroup(event) {
+                const checkbox = event.currentTarget;
+                const group = checkbox.closest('.parameter-group');
+                const content = group.querySelector('.param-content');
+                
+                if (checkbox.checked) {
+                    content.style.display = 'block';
+                    group.classList.remove('opacity-50');
+                } else {
+                    content.style.display = 'none';
+                    group.classList.add('opacity-50');
+                }
+                saveState();
+            }
+
+            function getParameterValue(id, map) {
+                const select = document.getElementById(id);
+                const group = select.closest('.parameter-group');
+                const toggle = group.querySelector(`#toggle-${id}`);
+                
+                if (toggle && !toggle.checked) {
+                    return null; // Параметр отключен
+                }
+                
+                return map[select.value];
+            }
+// !!! ВОТ НОВАЯ ФУНКЦИЯ, КОТОРУЮ МЫ ДОБАВИЛИ !!!
+            function collectAllParameters() {
+                const selectedModel = document.querySelector('input[name="model"]:checked').value;
+                
+                const parameters = {
+                    style: getParameterValue('style', styleMap),
+                    camera: getParameterValue('camera', cameraMap),
+                    lighting: getParameterValue('lighting', lightingMap),
+                    cinematography: getParameterValue('cinematography', cinematographyMap),
+                    mood: getParameterValue('mood', moodMap),
+                    effect: getParameterValue('effect', effectMap),
+                    photoAnimation: getParameterValue('photo-animation', photoAnimationMap),
+                    background: getParameterValue('background', backgroundMap),
+                    duration: document.getElementById('toggle-duration').checked ? durationValue.textContent : null,
+                    
+                    audio: (enableModelSelectionCheckbox.checked === false || selectedModel === 'veo') && document.getElementById('toggle-audio').checked 
+                           ? audioMap[document.getElementById('audio').value] 
+                           : null,
+                           
+                    details: document.getElementById('toggle-details').checked ? detailsTextarea.value.trim() : null,
+                    negative: document.getElementById('toggle-negative').checked ? negativePromptTextarea.value.trim() : null,
+                    generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                };
+                
+                if (styleSelect.value === 'anime' && document.getElementById('toggle-style').checked) {
+                    const studio = animeStudioSelect.value ? animeStudioMap[animeStudioSelect.value] : null;
+                    const animeStyle = animeStyleSelect.value ? animeStyleMap[animeStyleSelect.value] : null;
+                    const manga = animeMangaInput.value.trim();
+
+                    if (studio) parameters.animeStudio = studio;
+                    if (animeStyle) parameters.animeStyle = animeStyle;
+                    if (manga) parameters.animeManga = manga;
+                }
+
+                return parameters;
+            }
+
+
+            // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
+            // --- Единая функция генерации промпта (DRY) ---
+            async function generatePrompt(isSuperImprove = false, mode = null) { // Добавляем 'async'
+                const idea = ideaInput.value.trim();
+                if (!idea) {
+                    showNotification('Пожалуйста, введите вашу идею для видео.', 'warning');
+                    return;
+                }
+                
+                const btn = isSuperImprove ? superImproveBtn : improveBtn;
+                const originalBtnText = btn.innerHTML;
+                const otherBtn = isSuperImprove ? improveBtn : superImproveBtn;
+
+                // --- UI: Показываем спиннер ---
+                btn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    ${isSuperImprove ? 'Обработка Gemini...' : 'Обработка Gemini...'}
+                `;
+                btn.disabled = true;
+                otherBtn.disabled = true;
+                
+                // --- НОВЫЙ КОД API ---
+                
+                // 1. Сбор всех параметров
+                const parameters = collectAllParameters(); // Вызов новой вспомогательной функции
+
+                // 2. Адрес вашего локального сервера
+                const backendUrl = 'http://localhost:3000/api/generate-prompt'; 
+
+                try {
+                    // 3. Отправка запроса на ваш сервер
+                    const response = await fetch(backendUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            idea: idea, 
+                            parameters: parameters, // Отправляем собранные параметры
+                            mode: mode ? mode : (isSuperImprove ? 'super-improve' : 'improve')
+                        })
+                    });
+
+                    // 4. Обработка ответа
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // 5. Отображение результата от Gemini
+                    promptOutput.value = data.generatedPrompt;
+                    resultSection.style.display = 'block';
+                    
+                    showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (error) {
+                    console.error('API Request Failed:', error);
+                    // Полезное сообщение об ошибке, если сервер не запущен
+                    if (error.message.includes('Failed to fetch')) {
+                        showNotification('Ошибка: Не удалось подключиться к серверу. Убедитесь, что сервер запущен (команда npm start).', 'error');
+                    } else {
+                        showNotification(`Ошибка API: ${error.message}`, 'error');
+                    }
+                } finally {
+                    // 6. Сброс кнопок в любом случае
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                    otherBtn.disabled = false;
+                }
+            }
+            // --- Конец новой функции ---
+
+            function copyPrompt() {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(promptOutput.value)
+                        .then(() => {
+                            showNotification('Промпт скопирован в буфер обмена', 'success');
+                        })
+                        .catch(err => {
+                            fallbackCopy();
+                        });
+                } else {
+                    fallbackCopy();
+                }
+            }
+
+            function fallbackCopy() {
+                try {
+                    promptOutput.select();
+                    document.execCommand('copy');
+                    showNotification('Промпт скопирован в буфер обмена', 'success');
+                } catch (e) {
+                    showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
+                }
+            }
+            
+            function editPrompt() {
+                promptOutput.removeAttribute('readonly');
+                promptOutput.classList.add('bg-white', 'ring-2', 'ring-blue-500');
+                promptOutput.classList.remove('bg-gray-50');
+                promptOutput.focus();
+                
+                editBtn.innerHTML = `
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Сохранить изменения
+                `;
+                editBtn.classList.add('bg-green-100', 'text-green-700', 'hover:bg-green-200');
+                editBtn.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+
+                editBtn.removeEventListener('click', editPrompt);
+                editBtn.addEventListener('click', saveEditedPrompt);
+            }
+            
+            function saveEditedPrompt() {
+                promptOutput.setAttribute('readonly', true);
+                promptOutput.classList.remove('bg-white', 'ring-2', 'ring-blue-500');
+                promptOutput.classList.add('bg-gray-50');
+                
+                editBtn.innerHTML = `
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    Редактировать
+                `;
+                editBtn.classList.remove('bg-green-100', 'text-green-700', 'hover:bg-green-200');
+                editBtn.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                
+                editBtn.removeEventListener('click', saveEditedPrompt);
+                editBtn.addEventListener('click', editPrompt);
+                
+                showNotification('Изменения сохранены', 'success');
+            }
+            
+            function updateDurationValue() {
+                durationValue.textContent = durationSlider.value;
+                durationButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600'));
+                durationButtons.forEach(btn => btn.classList.add('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100'));
+                saveState();
+            }
+
+            function setDuration(event) {
+                const newDuration = event.currentTarget.dataset.duration;
+                durationValue.textContent = newDuration;
+                durationSlider.value = newDuration;
+
+                durationButtons.forEach(btn => {
+                    if (btn === event.currentTarget) {
+                        btn.classList.remove('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                        btn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                    } else {
+                        btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                        btn.classList.add('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                    }
+                });
+                
+                customDurationToggle.checked = false;
+                customDurationSliderGroup.classList.add('hidden');
+                saveState();
+            }
+
+            function toggleCustomDuration() {
+                if (customDurationToggle.checked) {
+                    customDurationSliderGroup.classList.remove('hidden');
+                    durationButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600'));
+                    durationButtons.forEach(btn => btn.classList.add('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100'));
+                } else {
+                    customDurationSliderGroup.classList.add('hidden');
+                    let isButtonSelected = false;
+                    durationButtons.forEach(btn => {
+                        if (btn.classList.contains('bg-blue-500')) {
+                            isButtonSelected = true;
+                        }
+                    });
+                    if (!isButtonSelected) {
+                        durationValue.textContent = '10';
+                        durationSlider.value = '10';
+                        document.querySelector('.duration-btn[data-duration="10"]').classList.remove('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                        document.querySelector('.duration-btn[data-duration="10"]').classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                    }
+                }
+                saveState();
+            }
+
+            function regeneratePrompt() {
+                generatePrompt();
+            }
+            
+            function savePrompt() {
+                showNotification('Промпт сохранен в вашу библиотеку (симуляция)', 'success');
+            }
+            
+            function exportPrompt() {
+                const prompt = promptOutput.value;
+                const negativePrompt = negativePromptTextarea.value.trim();
+                let fullExport = prompt;
+                if (negativePrompt) {
+                    fullExport += `\n\n--- NEGATIVE PROMPT ---\n${negativePrompt}`;
+                }
+
+                const blob = new Blob([fullExport], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ai_prompt_${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Промпт экспортирован в .txt файл', 'success');
+            }
+            
+            function showNotification(message, type = 'info', hasUndo = false) {
+                const colors = {
+                    success: 'bg-green-500',
+                    warning: 'bg-yellow-500',
+                    info: 'bg-blue-500',
+                    error: 'bg-red-500'
+                };
+                
+                const notification = document.createElement('div');
+                notification.className = `p-4 rounded-lg shadow-xl text-white font-medium mb-3 transition-all duration-300 transform translate-x-full opacity-0 ${colors[type]} flex items-center justify-between`;
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = message;
+                notification.appendChild(textSpan);
+
+                if (hasUndo) {
+                    const undoButton = document.createElement('button');
+                    undoButton.textContent = 'Отменить';
+                    undoButton.className = 'ml-4 px-3 py-1 bg-white text-gray-800 rounded-md font-bold hover:bg-gray-100 transition-colors';
+                    undoButton.onclick = undoReset;
+                    notification.appendChild(undoButton);
+                }
+
+                notificationContainer.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full', 'opacity-0');
+                    notification.classList.add('translate-x-0', 'opacity-100');
+                }, 100);
+                
+                setTimeout(() => {
+                    if (!hasUndo || !notification.querySelector('button')) {
+                        notification.classList.add('translate-x-full', 'opacity-0');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 300);
+                    }
+                }, 5000);
+            }
+
+            function applyPreset(event) {
+                const presetKey = event.currentTarget.dataset.preset;
+                const preset = presets[presetKey];
+
+                if (preset) {
+                    // Сброс всех параметров перед применением пресета
+                    resetParameters(false); 
+
+                    styleSelect.value = preset.style;
+                    document.getElementById('camera').value = preset.camera;
+                    document.getElementById('lighting').value = preset.lighting;
+                    document.getElementById('cinematography').value = preset.cinematography;
+                    document.getElementById('mood').value = preset.mood;
+                    document.getElementById('effect').value = preset.effect;
+                    document.getElementById('background').value = preset.background;
+                    document.getElementById('audio').value = preset.audio;
+                    detailsTextarea.value = preset.details;
+                    negativePromptTextarea.value = preset.negative;
+
+                    // Специальные настройки для аниме
+                    if (preset.style === 'anime') {
+                        toggleAnimeOptions();
+                        animeStudioSelect.value = preset.studio || '';
+                        animeStyleSelect.value = preset.animeStyle || '';
+                        animeMangaInput.value = preset.manga || '';
+                    } else {
+                        toggleAnimeOptions(); // Скроет, если не аниме
+                    }
+
+                    // Сброс длительности на 10 сек
+                    setDuration({ currentTarget: document.querySelector('.duration-btn[data-duration="10"]') });
+
+                    // Скрываем результат, чтобы пользователь нажал "Улучшить"
+                    resultSection.style.display = 'none';
+                    
+                    showNotification(`Применен шаблон: ${event.currentTarget.textContent}`, 'info');
+                    saveState();
+                }
+            }
+
+            function insertTag(event, textarea) {
+                const tag = event.currentTarget.dataset.tag;
+                let currentText = textarea.value.trim();
+                
+                // Проверяем, есть ли уже тег, чтобы избежать дублирования
+                const tagRegex = new RegExp(`\\b${tag.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+                if (tagRegex.test(currentText)) {
+                    showNotification(`Тег "${tag}" уже добавлен.`, 'warning');
+                    return;
+                }
+
+                if (currentText.length > 0) {
+                    // Добавляем запятую и пробел, если их нет
+                    if (!currentText.endsWith(',')) {
+                        currentText += ', ';
+                    } else if (currentText.endsWith(',')) {
+                        currentText += ' ';
+                    }
+                }
+
+                textarea.value = currentText + tag;
+                textarea.focus();
+                saveState();
+            }
+
+            function resetParameters(showNotificationFlag = true) {
+                if (showNotificationFlag) {
+                    // 1. Сохраняем текущее состояние для отмены
+                    undoState = localStorage.getItem(STORAGE_KEY);
+                }
+
+                // Сброс селектов
+                styleSelect.value = 'realistic';
+                document.getElementById('camera').value = 'medium-shot';
+                document.getElementById('lighting').value = 'natural';
+                document.getElementById('cinematography').value = '16:9';
+                document.getElementById('mood').value = 'epic';
+                document.getElementById('effect').value = 'none';
+                document.getElementById('background').value = 'urban-city';
+                document.getElementById('audio').value = 'none';
+                detailsTextarea.value = '';
+                negativePromptTextarea.value = '';
+                animeStudioSelect.value = '';
+                animeStyleSelect.value = '';
+                animeMangaInput.value = '';
+
+                // Сброс тогл-кнопок
+                toggleCheckboxes.forEach(checkbox => checkbox.checked = true);
+                parameterGroups.forEach(group => {
+                    group.classList.remove('opacity-50');
+                    group.querySelector('.param-content').style.display = 'block';
+                });
+
+                // Сброс длительности
+                setDuration({ currentTarget: document.querySelector('.duration-btn[data-duration="10"]') });
+                
+                // Сброс модели (Sora по умолчанию)
+                document.querySelector('input[name="model"][value="sora"]').checked = true;
+                toggleAudioSelector();
+                toggleAnimeOptions();
+
+                // Скрываем результат
+                resultSection.style.display = 'none';
+
+                if (showNotificationFlag) {
+                    showNotification('Все параметры сброшены к значениям по умолчанию.', 'info', true); // true для кнопки "Отменить"
+                }
+                saveState();
+            }
+
+            function undoReset() {
+                if (undoState) {
+                    localStorage.setItem(STORAGE_KEY, undoState);
+                    loadState(false); // Загружаем без уведомления
+                    undoState = null;
+                    // Удаляем все уведомления с кнопкой "Отменить"
+                    notificationContainer.querySelectorAll('button').forEach(btn => btn.closest('div').remove());
+                    showNotification('Сброс отменен. Состояние восстановлено.', 'success');
+                }
+            }
+
+            function randomizeParameters() {
+                // Рандомизация селектов
+                styleSelect.value = getRandomKey(styleMap);
+                document.getElementById('camera').value = getRandomKey(cameraMap);
+                document.getElementById('lighting').value = getRandomKey(lightingMap);
+                document.getElementById('cinematography').value = getRandomKey(cinematographyMap);
+                document.getElementById('mood').value = getRandomKey(moodMap);
+                document.getElementById('effect').value = getRandomKey(effectMap);
+                document.getElementById('background').value = getRandomKey(backgroundMap);
+                document.getElementById('audio').value = getRandomKey(audioMap);
+                
+                // Рандомизация длительности
+                const randomDuration = Math.floor(Math.random() * (60 - 4 + 1)) + 4;
+                durationSlider.value = randomDuration;
+                durationValue.textContent = randomDuration;
+                customDurationToggle.checked = true;
+                customDurationSliderGroup.classList.remove('hidden');
+                durationButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600'));
+                durationButtons.forEach(btn => btn.classList.add('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100'));
+
+                // Рандомизация тогл-кнопок (50/50)
+                toggleCheckboxes.forEach(checkbox => {
+                    checkbox.checked = Math.random() < 0.8; // Чаще оставляем включенными
+                    const group = checkbox.closest('.parameter-group');
+                    const content = group.querySelector('.param-content');
+                    if (checkbox.checked) {
+                        content.style.display = 'block';
+                        group.classList.remove('opacity-50');
+                    } else {
+                        content.style.display = 'none';
+                        group.classList.add('opacity-50');
+                    }
+                });
+
+                // Рандомизация аниме-секции, если выбран аниме-стиль
+                if (styleSelect.value === 'anime') {
+                    toggleAnimeOptions();
+                    animeStudioSelect.value = getRandomKey(animeStudioMap);
+                    animeStyleSelect.value = getRandomKey(animeStyleMap);
+                } else {
+                    toggleAnimeOptions();
+                }
+
+                // Рандомизация идеи (простая симуляция)
+                const randomWords = ['Epic', 'Cinematic', 'Futuristic', 'Magical', 'Dystopian', 'Peaceful', 'Intense'];
+                ideaInput.value = `${randomWords[Math.floor(Math.random() * randomWords.length)]} scene of a ${getRandomKey(backgroundMap).split(' ')[0]} with a ${getRandomKey(cameraMap).split(' ')[0]} shot.`;
+                
+                // Сброс текстовых полей деталей и негативного промпта
+                detailsTextarea.value = '';
+                negativePromptTextarea.value = '';
+
+                // Скрываем результат
+                resultSection.style.display = 'none';
+
+                showNotification('Параметры рандомизированы! Нажмите "Улучшить промпт" для генерации.', 'info');
+                saveState();
+            }
+
+            // --- Local Storage Functions ---
+            function saveState() {
+                const state = {
+                    model: document.querySelector('input[name="model"]:checked').value,
+                    enableModelSelection: enableModelSelectionCheckbox.checked,
+                    idea: ideaInput.value,
+                    style: styleSelect.value,
+                    camera: document.getElementById('camera').value,
+                    lighting: document.getElementById('lighting').value,
+                    cinematography: document.getElementById('cinematography').value,
+                    mood: document.getElementById('mood').value,
+                    effect: document.getElementById('effect').value,
+                    background: document.getElementById('background').value,
+                    audio: document.getElementById('audio').value,
+                    details: detailsTextarea.value,
+                    negative: negativePromptTextarea.value,
+                    duration: durationSlider.value,
+                    customDurationChecked: customDurationToggle.checked,
+                    selectedDurationButton: document.querySelector('.duration-btn.bg-blue-500')?.dataset.duration || '10',
+                    animeStudio: animeStudioSelect.value,
+                    animeStyle: animeStyleSelect.value,
+                    animeManga: animeMangaInput.value,
+                    toggles: {}
+                };
+                
+                toggleCheckboxes.forEach(checkbox => {
+                    state.toggles[checkbox.id] = checkbox.checked;
+                });
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }
+
+            function loadState(showNotificationFlag = true) {
+                const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (state) {
+                    // Модель
+                    document.querySelector(`input[name="model"][value="${state.model}"]`).checked = true;
+                    
+                    // Чекбокс выбора модели
+                    if (state.enableModelSelection !== undefined) {
+                        enableModelSelectionCheckbox.checked = state.enableModelSelection;
+                    }
+                    
+                    // Текстовые поля
+                    ideaInput.value = state.idea;
+                    detailsTextarea.value = state.details;
+                    negativePromptTextarea.value = state.negative;
+
+                    // Селекты
+                    styleSelect.value = state.style;
+                    document.getElementById('camera').value = state.camera;
+                    document.getElementById('lighting').value = state.lighting;
+                    document.getElementById('cinematography').value = state.cinematography;
+                    document.getElementById('mood').value = state.mood;
+                    document.getElementById('effect').value = state.effect;
+                    document.getElementById('background').value = state.background;
+                    document.getElementById('audio').value = state.audio;
+                    
+                    // Аниме
+                    animeStudioSelect.value = state.animeStudio || '';
+                    animeStyleSelect.value = state.animeStyle || '';
+                    animeMangaInput.value = state.animeManga || '';
+
+                    // Длительность
+                    durationSlider.value = state.duration;
+                    durationValue.textContent = state.duration;
+                    customDurationToggle.checked = state.customDurationChecked;
+                    
+                    // Обновление кнопок длительности
+                    durationButtons.forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                        btn.classList.add('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                        if (btn.dataset.duration === state.selectedDurationButton && !state.customDurationChecked) {
+                            btn.classList.remove('bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                            btn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                        }
+                    });
+
+                    if (state.customDurationChecked) {
+                        customDurationSliderGroup.classList.remove('hidden');
+                    } else {
+                        customDurationSliderGroup.classList.add('hidden');
+                    }
+                    
+                    // Тогглы
+                    toggleCheckboxes.forEach(checkbox => {
+                        if (state.toggles[checkbox.id] !== undefined) {
+                            checkbox.checked = state.toggles[checkbox.id];
+                            const group = checkbox.closest('.parameter-group');
+                            const content = group.querySelector('.param-content');
+                            if (checkbox.checked) {
+                                content.style.display = 'block';
+                                group.classList.remove('opacity-50');
+                            } else {
+                                content.style.display = 'none';
+                                group.classList.add('opacity-50');
+                            }
+                        }
+                    });
+
+                    toggleAudioSelector();
+                    toggleAnimeOptions();
+                    
+                    if (showNotificationFlag) {
+                        showNotification('Сохраненное состояние загружено.', 'info');
+                    }
+                } else {
+                    // Инициализация по умолчанию, если нет сохраненного состояния
+                    document.querySelector('.duration-btn[data-duration="10"]').classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                }
+            }
+            // --- End Local Storage Functions ---
+
+
+            // --- Слушатели событий ---
+            const aiAutopilotBtn = document.getElementById('ai-autopilot-btn'); // <-- ДОБАВЬТЕ ЭТО
+            improveBtn.addEventListener('click', () => generatePrompt(false));
+            superImproveBtn.addEventListener('click', () => generatePrompt(true));
+            aiAutopilotBtn.addEventListener('click', () => generatePrompt(false, 'auto-pilot')); // <-- И ДОБАВЬТЕ ЭТО
+            copyBtn.addEventListener('click', copyPrompt);
+            editBtn.addEventListener('click', editPrompt);
+            durationSlider.addEventListener('input', updateDurationValue);
+            regenerateBtn.addEventListener('click', regeneratePrompt);
+            exportBtn.addEventListener('click', exportPrompt);
+            resetParamsBtn.addEventListener('click', () => resetParameters(true));
+            randomPromptBtn.addEventListener('click', randomizeParameters); // Новая кнопка
+
+            durationButtons.forEach(btn => {
+                btn.addEventListener('click', setDuration);
+            });
+
+            customDurationToggle.addEventListener('change', toggleCustomDuration);
+
+            modelRadios.forEach(radio => {
+                radio.addEventListener('change', toggleAudioSelector);
+                radio.addEventListener('change', saveState);
+            });
+            
+            enableModelSelectionCheckbox.addEventListener('change', toggleModelSelection);
+            enableModelSelectionCheckbox.addEventListener('change', saveState);
+
+            styleSelect.addEventListener('change', toggleAnimeOptions);
+            styleSelect.addEventListener('change', saveState);
+
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', applyPreset);
+            });
+
+            // Новая логика для Быстрых тегов
+            quickTagContainers.forEach(container => {
+                container.querySelectorAll('[data-tag]').forEach(btn => {
+                    btn.addEventListener('click', (e) => insertTag(e, detailsTextarea));
+                });
+            });
+
+            negativeTagContainer.querySelectorAll('[data-tag]').forEach(btn => {
+                btn.addEventListener('click', (e) => insertTag(e, negativePromptTextarea));
+            });
+
+            // Слушатели для тогл-кнопок
+            toggleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', toggleParameterGroup);
+                checkbox.addEventListener('change', saveState);
+            });
+
+            // Сохранение состояния при изменении селектов и текстовых полей
+            document.querySelectorAll('select').forEach(select => select.addEventListener('change', saveState));
+            document.querySelectorAll('textarea').forEach(textarea => textarea.addEventListener('input', saveState));
+            document.querySelectorAll('input[type="text"]').forEach(input => input.addEventListener('input', saveState));
+            
+            // Инициализация
+            loadState(); // Загружаем состояние при старте
+            toggleModelSelection(); // Устанавливаем начальное состояние выбора модели
+            toggleAudioSelector(); // Устанавливаем начальное состояние аудиоселектора
+            toggleAnimeOptions(); // Устанавливаем начальное состояние аниме-секции
+        });
+    </script>
+</body>
+</html>
