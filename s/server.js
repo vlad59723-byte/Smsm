@@ -35,6 +35,14 @@ app.use(compression());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
+});
+
+app.get('/data.js', (req, res) => {
+    res.sendFile(__dirname + '/data.js');
+});
+
 
 // Rate Limiting
 const rateLimiter = new RateLimiterMemory({
