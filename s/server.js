@@ -73,7 +73,11 @@ app.get('/data.js', (req, res) => {
 // Схема для /generate-prompt (из V11)
 const promptSchema = Joi.object({
   idea: Joi.string().min(3).required(),
-  parameters: Joi.object().required(), 
+  parameters: Joi.object({
+    sceneComplexity: Joi.number().min(1).max(10),
+    intensityLevels: Joi.string().valid('slightly', 'moderately', 'extremely'),
+    generationModel: Joi.string().optional()
+  }).unknown(true),
   mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required(),
   operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional()
 });
@@ -94,8 +98,9 @@ const problemsSchema = Joi.object({
 
 // Схема для /generate-negative-prompt (из V11)
 const negativePromptSchema = Joi.object({
-  prompt: Joi.string().min(10).required(), // V11 использует 'prompt', второй файл 'positivePrompt'. 'prompt' универсальнее.
-  generationModel: Joi.string().optional()
+  prompt: Joi.string().min(10).required(),
+  generationModel: Joi.string().optional(),
+  clean: Joi.boolean().optional()
 });
 
 // Схема для /translate (из V11)
@@ -119,9 +124,26 @@ const validate = (schema) => (req, res, next) => {
   next();
 };
 
-// --- Обработчики API ---
+function addComplexityDetails(prompt, sceneComplexity) {
+    if (sceneComplexity > 7) {
+        prompt += ", ultra-detailed, 8k, trending on artstation";
+    } else if (sceneComplexity > 5) {
+        prompt += ", highly detailed, photorealistic";
+    }
+    return prompt;
+}
 
-// Обработчик /api/generate-prompt (V11 + Логика из второго файла)
+function applyIntensity(prompt, intensity) {
+    if (intensity === 'slightly') {
+        prompt = prompt.replace('fog', 'slightly foggy');
+    } else if (intensity === 'moderately') {
+        prompt = prompt.replace('fog', 'moderately smoky');
+    } else if (intensity === 'extremely') {
+        prompt = prompt.replace('fog', 'extremely dense fog');
+    }
+    return prompt;
+}
+
 const generatePromptHandler = async (req, res, next) => {
   try {
     const { idea, parameters, mode, operatingMode } = req.body; 
@@ -155,6 +177,9 @@ const generatePromptHandler = async (req, res, next) => {
 
     const result = await model.generateContent(systemInstruction);
     let generatedPrompt = result.response.text().trim(); // Используем let для возможности изменения
+
+    generatedPrompt = addComplexityDetails(generatedPrompt, parameters.sceneComplexity);
+    generatedPrompt = applyIntensity(generatedPrompt, parameters.intensityLevels);
 
     // --- ДОБАВЛЕНО: Логика "Режима Работы" из второго файла ---
     if (operatingMode === 'no-names') {
@@ -236,27 +261,34 @@ const predictProblemsHandler = async (req, res, next) => {
 
 // Обработчик /api/generate-negative-prompt (из V11, т.к. промпт лучше)
 const generateNegativePromptHandler = async (req, res, next) => {
-  try {
-    const { prompt, generationModel } = req.body; // Используем { prompt } из V11
-    const modelName = generationModel || 'gemini-2.5-flash';
-    const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Negative Prompt): ${modelName}`);
+    try {
+        const { prompt, generationModel, clean } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        logger.info(`Using model (Negative Prompt): ${modelName}`);
 
-    const generationPrompt = `
+        const generationPrompt = `
         Вы — эксперт по негативным промптам для ИИ-генераторов видео.
         ПОЗИТИВНЫЙ ПРОМПТ: "${prompt}"
 
         ЗАДАЧА: Сгенерируйте краткий список (5-10) ключевых слов для НЕГАТИВНОГО промпта, чтобы избежать распространенных ошибок генерации (артефактов, размытия, плохого качества, деформаций), которые могут возникнуть с этим стилем.
         ОТВЕТ: Только список тегов через запятую.
     `;
-    
-    const result = await model.generateContent(generationPrompt);
-    const generatedNegative = result.response.text().trim();
-    res.json({ generatedNegative });
-    logger.info('Negative prompt generated successfully');
-  } catch (error) {
-    next(error);
-  }
+
+        const result = await model.generateContent(generationPrompt);
+        let generatedNegative = result.response.text().trim();
+
+        if (clean) {
+            const commonErrors = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+            generatedNegative = generatedNegative.replace(commonErrors, '');
+            generatedNegative = generatedNegative.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
+        }
+
+        res.json({ generatedNegative });
+        logger.info('Negative prompt generated successfully');
+    } catch (error) {
+        next(error);
+    }
 };
 
 // Обработчик /api/translate (из V11, т.к. промпт лучше)
