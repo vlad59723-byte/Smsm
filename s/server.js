@@ -57,13 +57,24 @@ app.use(compression());
 app.use(rateLimiterMiddleware);
 app.use(express.static(__dirname)); // Раздача ai_prompt_creator_v11_enhanced.html
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
+});
+
+app.get('/data.js', (req, res) => {
+    res.sendFile(__dirname + '/data.js');
+});
+
+
 // --- Схемы валидации Joi ---
 
 // Схема для /generate-prompt
 const promptSchema = Joi.object({
   idea: Joi.string().min(3).required(),
   parameters: Joi.object().required(), 
-  mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required()
+  mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required(),
+  // ДОБАВЛЕНО: Валидация для "Режима Работы"
+  operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional()
 });
 
 // Схема для /generate-tags
@@ -112,7 +123,7 @@ const validate = (schema) => (req, res, next) => {
 // Обработчик /api/generate-prompt
 const generatePromptHandler = async (req, res, next) => {
   try {
-    const { idea, parameters, mode } = req.body;
+    const { idea, parameters, mode, operatingMode } = req.body; // <-- Добавлен operatingMode
     const modelName = parameters.generationModel || 'gemini-2.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
     logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}`);
