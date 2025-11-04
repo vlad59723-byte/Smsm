@@ -168,6 +168,16 @@
                 <!-- Presets Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
                     <h3 class="text-xl font-semibold mb-5 text-gray-800">2. Шаблоны (Пресеты):</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <input type="text" id="preset-filter" class="w-1/2 p-2 border border-gray-300 rounded-lg" placeholder="Фильтр пресетов...">
+                        <select id="preset-sort" class="w-1/2 p-2 border border-gray-300 rounded-lg">
+                            <option value="default">Сортировка по умолчанию</option>
+                            <option value="name-asc">По имени (А-Я)</option>
+                            <option value="name-desc">По имени (Я-А)</option>
+                            <option value="style">По стилю</option>
+                            <option value="mood">По настроению</option>
+                        </select>
+                    </div>
                     <div class="flex flex-wrap gap-3" id="preset-buttons">
                         <button data-preset="cinematic-epic" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Эпический Кинематограф</button>
                         <button data-preset="cyberpunk-neon" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Киберпанк Неон</button>
@@ -195,12 +205,12 @@
                 </div>
                 <!-- End Presets Section -->
                 <!-- Detail Level Section -->
-                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg" title="Выберите уровень для автоматического добавления тегов качества и детализации.">
                     <h3 class="text-xl font-semibold mb-5 text-gray-800">2.5. Уровень Детализации:</h3>
                     <div class="flex flex-wrap gap-3" id="detail-level-buttons">
-                        <button data-level="basic" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Basic</button>
-                        <button data-level="detailed" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Detailed</button>
-                        <button data-level="masterpiece" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Masterpiece</button>
+                        <button data-level="basic" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="high quality, detailed">Basic</button>
+                        <button data-level="detailed" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="masterpiece, best quality, highly detailed, photorealistic, cinematic light">Detailed</button>
+                        <button data-level="masterpiece" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="ultra-detailed, 8k, extremely detailed face, volumetric light, trending on artstation, unreal engine 5, octane render">Masterpiece</button>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">Добавляет теги качества в поле "Дополнительные детали".</p>
                 </div>
@@ -481,6 +491,27 @@
                 </div>
                 <!-- End Parameters Section -->
 
+                <!-- Advanced Parameters Section -->
+                <div class="mt-8 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Расширенные параметры</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="scene-complexity" class="block text-sm font-medium text-gray-700">Сложность сцены: <span id="scene-complexity-value">5</span>/10</label>
+                            <input type="range" id="scene-complexity" min="1" max="10" value="5" class="w-full" title="Чем выше значение, тем больше деталей и тегов будет добавлено автоматически.">
+                        </div>
+                        <div>
+                            <label for="fog-intensity" class="block text-sm font-medium text-gray-700">Туман/Дым:</label>
+                            <select id="fog-intensity" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Добавляет эффект тумана или дыма различной интенсивности.">
+                                <option value="none">Нет</option>
+                                <option value="slightly">Слегка туманно</option>
+                                <option value="moderately">Умеренно дымно</option>
+                                <option value="extremely">Очень густой туман</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Advanced Parameters Section -->
+    
                 <!-- Details Section -->
                 <div class="mt-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
                     <div class="flex justify-between items-center mb-2">
@@ -537,7 +568,7 @@
                 <!-- End Details Section -->
 
                 <!-- Negative Prompt Section -->
-                <div class="mt-8 p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
+                <div class="mt-8 p-6 bg-red-50 rounded-xl shadow-lg parameter-group" title="Выберите готовые наборы негативных тегов для исключения нежелательных элементов.">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xl font-semibold text-red-800">7. Негативный Промпт (Что исключить):</h3>
                         <label class="flex items-center cursor-pointer">
@@ -547,15 +578,15 @@
                     </div>
                     <div class="param-content">
                         <div class="mb-4 space-y-2" id="negative-prompt-groups">
-                            <label class="flex items-center">
+                            <label class="flex items-center" title="ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face">
                                 <input type="checkbox" data-group="standard" class="form-checkbox h-5 w-5 text-red-600">
                                 <span class="ml-2 text-gray-700">Standard Block (руки, низкое качество, размытость)</span>
                             </label>
-                            <label class="flex items-center">
+                            <label class="flex items-center" title="text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry">
                                 <input type="checkbox" data-group="anime" class="form-checkbox h-5 w-5 text-red-600">
                                 <span class="ml-2 text-gray-700">Anime Block (текст, водяные знаки, низкий рейтинг)</span>
                             </label>
-                            <label class="flex items-center">
+                            <label class="flex items-center" title="two heads, ugly skin, deformed body, bad proportions, bad posture, crooked limbs, extra limbs, fused limbs, bad anatomy">
                                 <input type="checkbox" data-group="realistic" class="form-checkbox h-5 w-5 text-red-600">
                                 <span class="ml-2 text-gray-700">Realistic Block (две головы, уродливая кожа, деформированное тело)</span>
                             </label>
@@ -567,6 +598,9 @@
                                 </button>
                                 <button id="predict-problems-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-semibold rounded-lg shadow-md hover:from-gray-700 hover:to-gray-800 transition-all duration-200">
                                     🤖 Предсказать проблемы
+                                </button>
+                                <button id="clear-negative-btn" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-all duration-200">
+                                    Очистить
                                 </button>
                                 <input type="number" id="negative-weight" class="w-24 p-2 border border-gray-300 rounded-lg" placeholder="Вес" step="0.1" min="0" max="2">
                             </div>
@@ -600,7 +634,7 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         Сбросить параметры
                     </button>
-                    <button id="random-prompt-btn" class="px-6 py-3 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-all duration-200 flex items-center">
+                    <button id="random-prompt-btn" class="px-6 py-3 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-all duration-200 flex items-center" title="Генерировать случайную 'Идею' и набор 'Деталей' для творческого поиска.">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         Мне повезет!
                     </button>
@@ -658,6 +692,13 @@
                     </div>
                 </div>
                 <!-- End Result Section -->
+
+                <!-- Real-time Prompt Visualization -->
+                <div class="mt-8 p-6 bg-gray-50 rounded-xl shadow-inner">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Визуализация Промпта</h3>
+                    <div id="prompt-visualization" class="p-4 bg-white rounded-lg border border-gray-200 text-sm font-mono"></div>
+                </div>
+                <!-- End Real-time Prompt Visualization -->
 
                 <!-- History and Favorites Section -->
                 <div id="history-favorites-section" class="mt-12 p-6 bg-white rounded-xl shadow-lg">
@@ -776,6 +817,13 @@
 
             const HISTORY_KEY = 'aiPromptCreatorHistoryV11';
             const FAVORITES_KEY = 'aiPromptCreatorFavoritesV11';
+            const sceneComplexitySlider = document.getElementById('scene-complexity');
+            const sceneComplexityValue = document.getElementById('scene-complexity-value');
+            const fogIntensitySelect = document.getElementById('fog-intensity');
+            const clearNegativeBtn = document.getElementById('clear-negative-btn');
+            const promptVisualization = document.getElementById('prompt-visualization');
+            const presetFilter = document.getElementById('preset-filter');
+            const presetSort = document.getElementById('preset-sort');
 
             // --- Расширенные карты параметров ---
             const styleMap = {
@@ -1312,6 +1360,8 @@
                 const selectedModel = document.querySelector('input[name="model"]:checked').value;
                 
                 const parameters = {
+                    sceneComplexity: sceneComplexitySlider.value,
+                    fogIntensity: fogIntensitySelect.value,
                     style: getParameterValue('style', styleMap),
                     camera: getParameterValue('camera', cameraMap),
                     lighting: getParameterValue('lighting', lightingMap),
@@ -1943,6 +1993,40 @@
                     showNotification('Ошибка генерации идей.', 'error');
                 }
             }
+
+            function clearNegativePrompt() {
+                const commonNegativeTags = ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy', 'noise', 'ugly', 'disfigured', 'oversaturated', 'monochrome', 'cartoon', 'cropped', 'duplicate'];
+                let currentNegativeText = negativePromptTextarea.value;
+                commonNegativeTags.forEach(tag => {
+                    const tagRegex = new RegExp(`\\b${tag}\\b`, 'gi');
+                    currentNegativeText = currentNegativeText.replace(tagRegex, '');
+                });
+                negativePromptTextarea.value = currentNegativeText.replace(/, ,/g, ',').replace(/, /g, ' ').trim();
+                showNotification('Общие негативные теги удалены.', 'info');
+            }
+
+            function updatePromptVisualization() {
+                const { sceneComplexity, fogIntensity, ...parameters } = collectAllParameters();
+                let html = '';
+
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
+                html += `<span class="text-green-600">${idea}</span>`;
+
+                for (const [key, value] of Object.entries(parameters)) {
+                    if (value) {
+                        html += `, <span class="text-blue-600">${key}: ${value}</span>`;
+                    }
+                }
+
+                if (sceneComplexity > 5) {
+                    html += `, <span class="text-purple-600">scene complexity: ${sceneComplexity}</span>`;
+                }
+                if (fogIntensity !== 'none') {
+                    html += `, <span class="text-gray-600">fog intensity: ${fogIntensity}</span>`;
+                }
+
+                promptVisualization.innerHTML = html;
+            }
             // --- History and Favorites Logic ---
             function saveToHistory() {
                 const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -2034,6 +2118,60 @@
                     loadFavorites();
                     showNotification('Промпт добавлен в избранное.', 'success');
                 }
+             }
+
+            function filterAndSortPresets() {
+                const filterValue = presetFilter.value.toLowerCase();
+                const sortValue = presetSort.value;
+                const presetButtonsContainer = document.getElementById('preset-buttons');
+
+                let buttons = Array.from(presetButtonsContainer.querySelectorAll('.preset-btn'));
+
+                // Filter
+                buttons.forEach(btn => {
+                    const presetName = btn.textContent.toLowerCase();
+                    const presetKey = btn.dataset.preset;
+                    const presetData = presets[presetKey];
+
+                    let searchableText = presetName;
+                    if (presetData) {
+                        searchableText += ` ${presetData.style} ${presetData.mood}`;
+                    }
+
+                    if (searchableText.includes(filterValue)) {
+                        btn.style.display = 'inline-block';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+
+                // Sort
+                if (sortValue === 'name-asc') {
+                    buttons.sort((a, b) => a.textContent.localeCompare(b.textContent));
+                } else if (sortValue === 'name-desc') {
+                    buttons.sort((a, b) => b.textContent.localeCompare(a.textContent));
+                } else if (sortValue === 'style') {
+                    buttons.sort((a, b) => {
+                        const presetA = presets[a.dataset.preset];
+                        const presetB = presets[b.dataset.preset];
+                        if (presetA && presetB) {
+                            return (presetA.style || '').localeCompare(presetB.style || '');
+                        }
+                        return 0;
+                    });
+                } else if (sortValue === 'mood') {
+                    buttons.sort((a, b) => {
+                        const presetA = presets[a.dataset.preset];
+                        const presetB = presets[b.dataset.preset];
+                        if (presetA && presetB) {
+                            return (presetA.mood || '').localeCompare(presetB.mood || '');
+                        }
+                        return 0;
+                    });
+                }
+
+                // Re-append to container
+                buttons.forEach(btn => presetButtonsContainer.appendChild(btn));
             }
 
             function switchTab(tab) {
@@ -2054,9 +2192,60 @@
                 }
             }
 
+            function updatePresetHighlighting() {
+                const currentStyle = styleSelect.value;
+                const currentLighting = document.getElementById('lighting').value;
+                const currentMood = document.getElementById('mood').value;
+                const currentCamera = document.getElementById('camera').value;
+                const currentCinematography = document.getElementById('cinematography').value;
+                const currentEffect = document.getElementById('effect').value;
+                const currentBackground = document.getElementById('background').value;
+
+                const currentSettings = {
+                    style: currentStyle,
+                    lighting: currentLighting,
+                    mood: currentMood,
+                    camera: currentCamera,
+                    cinematography: currentCinematography,
+                    effect: currentEffect,
+                    background: currentBackground
+                };
+
+                presetButtons.forEach(btn => {
+                    const presetKey = btn.dataset.preset;
+                    const presetData = presets[presetKey];
+                    if (!presetData) return;
+
+                    let matchCount = 0;
+                    for (const key in currentSettings) {
+                        const selectElement = document.getElementById(key);
+                        if (!selectElement) continue;
+
+                        const group = selectElement.closest('.parameter-group');
+                        const toggle = group?.querySelector('.toggle-checkbox');
+
+                        if (toggle && !toggle.checked) {
+                            continue;
+                        }
+
+                        if (presetData[key] && presetData[key] === currentSettings[key]) {
+                            matchCount++;
+                        }
+                    }
+
+                    if (matchCount >= 2) {
+                        btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500', 'transition-all', 'duration-200');
+                    } else {
+                        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500');
+                    }
+                });
+            }
+
             // --- Local Storage Functions ---
             function saveState() {
                 const state = {
+                    sceneComplexity: sceneComplexitySlider.value,
+                    fogIntensity: fogIntensitySelect.value,
                     model: document.querySelector('input[name="model"]:checked').value,
                     enableModelSelection: enableModelSelectionCheckbox.checked,
                     subject: subjectInput.value,
@@ -2091,6 +2280,9 @@
             function loadState(showNotificationFlag = true) {
                 const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
                 if (state) {
+                    sceneComplexitySlider.value = state.sceneComplexity || '5';
+                    sceneComplexityValue.textContent = state.sceneComplexity || '5';
+                    fogIntensitySelect.value = state.fogIntensity || 'none';
                     // Модель
                     document.querySelector(`input[name="model"][value="${state.model}"]`).checked = true;
                     
@@ -2227,7 +2419,16 @@
             // Сохранение состояния при изменении селектов и текстовых полей
             document.querySelectorAll('select').forEach(select => select.addEventListener('change', saveState));
             document.querySelectorAll('textarea').forEach(textarea => textarea.addEventListener('input', saveState));
-            document.querySelectorAll('input[type="text"]').forEach(input => input.addEventListener('input', saveState));
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.addEventListener('input', saveState);
+                input.addEventListener('input', updatePromptVisualization);
+            });
+            document.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', updatePromptVisualization);
+                select.addEventListener('change', updatePresetHighlighting);
+            });
+            document.querySelectorAll('textarea').forEach(textarea => textarea.addEventListener('input', updatePromptVisualization));
+            document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', updatePromptVisualization));
             
             // Инициализация
             loadState(); // Загружаем состояние при старте
@@ -2237,6 +2438,7 @@
             toggleModelSelection(); // Устанавливаем начальное состояние выбора модели
             toggleAudioSelector(); // Устанавливаем начальное состояние аудиоселектора
             toggleAnimeOptions(); // Устанавливаем начальное состояние аниме-секции
+            updatePresetHighlighting(); // Подсвечиваем пресеты при загрузке
 
             // --- Новая логика для кнопок "Предложить" ---
             const suggestButtons = document.querySelectorAll('.suggest-btn');
@@ -2308,31 +2510,31 @@
                 'default': ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy']
             };
 
-            function generateNegativePrompt() {
-                const currentStyle = styleSelect.value;
-                const suggestions = negativeSuggestions[currentStyle] || negativeSuggestions['default'];
-                
-                let currentNegativeText = negativePromptTextarea.value.trim();
-                let tagsAdded = [];
+            
+            async function generateNegativePrompt() {
+                const positivePrompt = promptOutput.value;
+                if (!positivePrompt) {
+                    showNotification('Сначала сгенерируйте основной промпт.', 'warning');
+                    return;
+                }
 
-                suggestions.forEach(tag => {
-                    const tagRegex = new RegExp(`\\b${tag}\\b`, 'i');
-                    if (!tagRegex.test(currentNegativeText)) {
-                        tagsAdded.push(tag);
-                    }
-                });
-
-                if (tagsAdded.length > 0) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/generate-negative-prompt', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            positivePrompt: positivePrompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+                    const data = await response.json();
+                    let currentNegativeText = negativePromptTextarea.value.trim();
                     if (currentNegativeText.length > 0 && !currentNegativeText.endsWith(',')) {
                         currentNegativeText += ', ';
-                    } else if (currentNegativeText.length > 0) {
-                        currentNegativeText += ' ';
-                    }
-                    currentNegativeText += tagsAdded.join(', ');
-                    negativePromptTextarea.value = currentNegativeText;
-                    showNotification(`Добавлены негативные теги: ${tagsAdded.join(', ')}`, 'success');
-                } else {
-                    showNotification('Все релевантные негативные теги уже добавлены.', 'info');
+                    negativePromptTextarea.value = currentNegativeText + data.negativeTags;
+                    showNotification('Негативные теги сгенерированы.', 'success');
+                } catch (error) {
+                    showNotification('Ошибка генерации негативных тегов.', 'error');
                 }
                 saveState();
             }
@@ -2601,6 +2803,15 @@
                     deletePrompt(parseInt(e.target.dataset.id), 'favorites');
                 }
             });
+
+            presetFilter.addEventListener('input', filterAndSortPresets);
+            presetSort.addEventListener('change', filterAndSortPresets);
+
+            sceneComplexitySlider.addEventListener('input', () => {
+                sceneComplexityValue.textContent = sceneComplexitySlider.value;
+            });
+
+            clearNegativeBtn.addEventListener('click', clearNegativePrompt);
 
             // --- Scroll to Top Logic ---
             window.addEventListener('scroll', () => {
