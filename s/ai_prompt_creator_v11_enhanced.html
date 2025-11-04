@@ -508,6 +508,14 @@
                                 <option value="extremely">Очень густой туман</option>
                             </select>
                         </div>
+                        <div>
+                            <label for="intensity-select" class="block text-sm font-medium text-gray-700">Интенсивность:</label>
+                            <select id="intensity-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="slightly">Slightly</option>
+                                <option value="moderately" selected>Moderately</option>
+                                <option value="extremely">Extremely</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <!-- End Advanced Parameters Section -->
@@ -1306,6 +1314,19 @@
                 }
                 saveState();
             }
+
+            function applyIntensity(prompt) {
+                const intensitySelect = document.getElementById('intensity-select');
+                const intensity = intensitySelect.value;
+                if (intensity === 'slightly') {
+                    prompt = prompt.replace('fog', 'slightly foggy');
+                } else if (intensity === 'moderately') {
+                    prompt = prompt.replace('fog', 'moderately smoky');
+                } else if (intensity === 'extremely') {
+                    prompt = prompt.replace('fog', 'extremely dense fog');
+                }
+                return prompt;
+            }
             
             function toggleModelSelection() {
                 const isEnabled = enableModelSelectionCheckbox.checked;
@@ -1358,10 +1379,12 @@
 // !!! ВОТ НОВАЯ ФУНКЦИЯ, КОТОРУЮ МЫ ДОБАВИЛИ !!!
             function collectAllParameters() {
                 const selectedModel = document.querySelector('input[name="model"]:checked').value;
+                const intensitySelect = document.getElementById('intensity-select');
                 
                 const parameters = {
                     sceneComplexity: sceneComplexitySlider.value,
                     fogIntensity: fogIntensitySelect.value,
+                    intensityLevels: intensitySelect.value,
                     style: getParameterValue('style', styleMap),
                     camera: getParameterValue('camera', cameraMap),
                     lighting: getParameterValue('lighting', lightingMap),
@@ -1995,14 +2018,20 @@
             }
 
             function clearNegativePrompt() {
-                const commonNegativeTags = ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy', 'noise', 'ugly', 'disfigured', 'oversaturated', 'monochrome', 'cartoon', 'cropped', 'duplicate'];
                 let currentNegativeText = negativePromptTextarea.value;
-                commonNegativeTags.forEach(tag => {
-                    const tagRegex = new RegExp(`\\b${tag}\\b`, 'gi');
-                    currentNegativeText = currentNegativeText.replace(tagRegex, '');
-                });
-                negativePromptTextarea.value = currentNegativeText.replace(/, ,/g, ',').replace(/, /g, ' ').trim();
-                showNotification('Общие негативные теги удалены.', 'info');
+
+                if (currentNegativeText.length > 200) {
+                    const commonNegativeTags = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+                    let cleanedText = currentNegativeText.replace(commonNegativeTags, '');
+                    // Clean up trailing commas and whitespace
+                    cleanedText = cleanedText.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
+                    negativePromptTextarea.value = cleanedText;
+                    showNotification('Common negative tags (bad anatomy, low quality, artifacts) removed.', 'info');
+                } else {
+                    negativePromptTextarea.value = '';
+                    showNotification('Negative prompt cleared.', 'info');
+                }
+                saveState();
             }
 
             function updatePromptVisualization() {
@@ -2523,16 +2552,17 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            positivePrompt: positivePrompt,
-                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                            prompt: positivePrompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value,
+                            clean: true
                         })
                     });
                     const data = await response.json();
                     let currentNegativeText = negativePromptTextarea.value.trim();
                     if (currentNegativeText.length > 0 && !currentNegativeText.endsWith(',')) {
                         currentNegativeText += ', ';
-                    } // <--- ВОТ ИСПРАВЛЕНИЕ
-                    negativePromptTextarea.value = currentNegativeText + data.negativeTags;
+                    }
+                    negativePromptTextarea.value = currentNegativeText + data.generatedNegative;
                     showNotification('Негативные теги сгенерированы.', 'success');
                 } catch (error) {
                     showNotification('Ошибка генерации негативных тегов.', 'error');
