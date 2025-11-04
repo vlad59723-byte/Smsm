@@ -639,6 +639,10 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-7 4l-3 3m0 0l3 3m-3-3h10"></path></svg>
                             Копировать
                         </button>
+                        <button id="add-to-favorites-btn" class="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition-all duration-200 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v1h-14v-1zM5 8h14v10a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"></path></svg>
+                            В избранное
+                        </button>
                         <button id="edit-btn" class="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition-all duration-200 flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             Редактировать
@@ -654,6 +658,28 @@
                     </div>
                 </div>
                 <!-- End Result Section -->
+
+                <!-- History and Favorites Section -->
+                <div id="history-favorites-section" class="mt-12 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">История и Избранное</h3>
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <button id="history-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-600">
+                                История
+                            </button>
+                            <button id="favorites-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Избранное
+                            </button>
+                        </nav>
+                    </div>
+                    <div id="history-list" class="mt-4 space-y-3">
+                        <!-- History items will be injected here -->
+                    </div>
+                    <div id="favorites-list" class="mt-4 space-y-3 hidden">
+                        <!-- Favorites items will be injected here -->
+                    </div>
+                </div>
+                <!-- End History and Favorites Section -->
 
             </div>
         </section>
@@ -742,6 +768,14 @@
             const operatingModeSelect = document.getElementById('operating-mode');
             const translateToEnglishBtn = document.getElementById('translate-to-english-btn');
             const generateIdeasBtn = document.getElementById('generate-ideas-btn');
+            const historyTab = document.getElementById('history-tab');
+            const favoritesTab = document.getElementById('favorites-tab');
+            const historyList = document.getElementById('history-list');
+            const favoritesList = document.getElementById('favorites-list');
+            const addToFavoritesBtn = document.getElementById('add-to-favorites-btn');
+
+            const HISTORY_KEY = 'aiPromptCreatorHistoryV11';
+            const FAVORITES_KEY = 'aiPromptCreatorFavoritesV11';
 
             // --- Расширенные карты параметров ---
             const styleMap = {
@@ -1314,26 +1348,32 @@
             // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
             // --- Единая функция генерации промпта (DRY) ---
             async function generatePrompt(isSuperImprove = false, mode = null) { // Добавляем 'async'
+                saveToHistory();
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею для видео.', 'warning');
                     return;
                 }
-                
-                const btn = isSuperImprove ? superImproveBtn : improveBtn;
-                const originalBtnText = btn.innerHTML;
-                const otherBtn = isSuperImprove ? improveBtn : superImproveBtn;
 
-                // --- UI: Показываем спиннер ---
-                btn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    ${isSuperImprove ? 'Обработка Gemini...' : 'Обработка Gemini...'}
-                `;
-                btn.disabled = true;
-                otherBtn.disabled = true;
+                // === НАЧАЛО ИСПРАВЛЕНИЯ ===
+
+                // 1. Определяем режим API на основе нажатой кнопки
+                let apiMode;
+                if (mode === 'auto-pilot') {
+                    apiMode = 'auto-pilot';
+                } else if (isSuperImprove) {
+                    apiMode = 'super-improve';
+                } else {
+                    apiMode = 'improve';
+                }
+
+                // 2. Получаем значение "Режима Работы" из выпадающего списка
+                const operatingMode = operatingModeSelect.value;
+                
+                // === КОНЕЦ ИСПРАВЛЕНИЯ ===
+
+                const btn = isSuperImprove ? superImproveBtn : improveBtn;
+                // ... (остальной код) ...
                 
                 // --- НОВЫЙ КОД API ---
                 
@@ -1351,7 +1391,8 @@
                         body: JSON.stringify({ 
                             idea: idea, 
                             parameters: parameters, // Отправляем собранные параметры
-                            mode: operatingModeSelect.value
+                            mode: apiMode, // <--- ИСПРАВЛЕНО
+                            operatingMode: operatingMode // <--- ДОБАВЛЕНО
                         })
                     });
 
@@ -1731,7 +1772,7 @@
 
                 // Рандомизация идеи (простая симуляция)
                 const randomWords = ['Epic', 'Cinematic', 'Futuristic', 'Magical', 'Dystopian', 'Peaceful', 'Intense'];
-                ideaInput.value = `${randomWords[Math.floor(Math.random() * randomWords.length)]} scene of a ${getRandomKey(backgroundMap).split(' ')[0]} with a ${getRandomKey(cameraMap).split(' ')[0]} shot.`;
+                subjectInput.value = `${randomWords[Math.floor(Math.random() * randomWords.length)]} scene of a ${getRandomKey(backgroundMap).split(' ')[0]} with a ${getRandomKey(cameraMap).split(' ')[0]} shot.`;
                 
                 // Сброс текстовых полей деталей и негативного промпта
                 detailsTextarea.value = '';
@@ -1890,6 +1931,116 @@
                     showNotification('Новая идея сгенерирована!', 'success');
                 } catch (error) {
                     showNotification('Ошибка генерации идей.', 'error');
+                }
+            }
+            // --- History and Favorites Logic ---
+            function saveToHistory() {
+                const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (!state) return;
+
+                let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+                history.unshift({ ...state, id: Date.now() });
+                if (history.length > 20) {
+                    history.pop();
+                }
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+                loadHistory();
+            }
+
+            function addToFavorites() {
+                const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (!state) {
+                    showNotification('Сначала сгенерируйте промпт.', 'warning');
+                    return;
+                }
+
+                let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+                favorites.unshift({ ...state, id: Date.now() });
+                localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+                loadFavorites();
+                showNotification('Промпт добавлен в избранное.', 'success');
+            }
+
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+                renderList(historyList, history, 'history');
+            }
+
+            function loadFavorites() {
+                const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+                renderList(favoritesList, favorites, 'favorites');
+            }
+
+            function renderList(container, items, type) {
+                container.innerHTML = '';
+                if (items.length === 0) {
+                    container.innerHTML = `<p class="text-gray-500">Нет сохраненных промптов.</p>`;
+                    return;
+                }
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'p-4 bg-gray-50 rounded-lg flex justify-between items-center';
+                    div.innerHTML = `
+                        <p class="text-sm text-gray-700 truncate">${item.subject || 'Без названия'}</p>
+                        <div class="flex space-x-2">
+                            <button data-id="${item.id}" class="reuse-btn px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs hover:bg-blue-200">Переиспользовать</button>
+                            ${type === 'history' ? `<button data-id="${item.id}" class="add-to-favorites-from-history-btn px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md text-xs hover:bg-yellow-200">В избранное</button>` : ''}
+                            <button data-id="${item.id}" class="delete-btn px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs hover:bg-red-200">Удалить</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            function reusePrompt(id, type) {
+                const items = JSON.parse(localStorage.getItem(type === 'history' ? HISTORY_KEY : FAVORITES_KEY)) || [];
+                const item = items.find(i => i.id === id);
+                if (item) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(item));
+                    loadState(false);
+                    showNotification('Промпт загружен.', 'success');
+                }
+            }
+
+            function deletePrompt(id, type) {
+                let items = JSON.parse(localStorage.getItem(type === 'history' ? HISTORY_KEY : FAVORITES_KEY)) || [];
+                items = items.filter(i => i.id !== id);
+                localStorage.setItem(type === 'history' ? HISTORY_KEY : FAVORITES_KEY, JSON.stringify(items));
+                if (type === 'history') {
+                    loadHistory();
+                } else {
+                    loadFavorites();
+                }
+                showNotification('Промпт удален.', 'info');
+            }
+
+            function addToFavoritesFromHistory(id) {
+                const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+                const item = history.find(i => i.id === id);
+                if (item) {
+                    let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+                    favorites.unshift(item);
+                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+                    loadFavorites();
+                    showNotification('Промпт добавлен в избранное.', 'success');
+                }
+            }
+
+            function switchTab(tab) {
+                if (tab === 'history') {
+                    historyTab.classList.add('text-blue-600', 'border-blue-600');
+                    historyTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    favoritesTab.classList.remove('text-blue-600', 'border-blue-600');
+                    favoritesTab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    historyList.classList.remove('hidden');
+                    favoritesList.classList.add('hidden');
+                } else {
+                    favoritesTab.classList.add('text-blue-600', 'border-blue-600');
+                    favoritesTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    historyTab.classList.remove('text-blue-600', 'border-blue-600');
+                    historyTab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    favoritesList.classList.remove('hidden');
+                    historyList.classList.add('hidden');
                 }
             }
 
@@ -2071,6 +2222,8 @@
             // Инициализация
             loadState(); // Загружаем состояние при старте
             loadCustomPresets(); // Загружаем пользовательские пресеты
+            loadHistory(); // Загружаем историю
+            loadFavorites(); // Загружаем избранное
             toggleModelSelection(); // Устанавливаем начальное состояние выбора модели
             toggleAudioSelector(); // Устанавливаем начальное состояние аудиоселектора
             toggleAnimeOptions(); // Устанавливаем начальное состояние аниме-секции
@@ -2080,7 +2233,7 @@
             
             async function handleSuggestClick(event) {
                 const targetId = event.currentTarget.dataset.target;
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
 
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею, чтобы получить предложение.', 'warning');
@@ -2215,7 +2368,7 @@
             const suggestTagsBtn = document.getElementById('suggest-tags-btn');
 
             async function handleSuggestTags() {
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 const prompt = promptOutput.value.trim();
 
                 if (!idea) {
@@ -2354,7 +2507,7 @@
             });
 
             async function handlePredictProblems() {
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 const prompt = promptOutput.value.trim();
 
                 if (!idea) {
@@ -2414,6 +2567,30 @@
             resetAnimeBtn.addEventListener('click', resetAnimeParameters);
             translateToEnglishBtn.addEventListener('click', translateToEnglish);
             generateIdeasBtn.addEventListener('click', generateIdeas);
+            addToFavoritesBtn.addEventListener('click', addToFavorites);
+            historyTab.addEventListener('click', () => switchTab('history'));
+            favoritesTab.addEventListener('click', () => switchTab('favorites'));
+
+            historyList.addEventListener('click', e => {
+                if (e.target.classList.contains('reuse-btn')) {
+                    reusePrompt(parseInt(e.target.dataset.id), 'history');
+                }
+                if (e.target.classList.contains('add-to-favorites-from-history-btn')) {
+                    addToFavoritesFromHistory(parseInt(e.target.dataset.id));
+                }
+                if (e.target.classList.contains('delete-btn')) {
+                    deletePrompt(parseInt(e.target.dataset.id), 'history');
+                }
+            });
+
+            favoritesList.addEventListener('click', e => {
+                if (e.target.classList.contains('reuse-btn')) {
+                    reusePrompt(parseInt(e.target.dataset.id), 'favorites');
+                }
+                if (e.target.classList.contains('delete-btn')) {
+                    deletePrompt(parseInt(e.target.dataset.id), 'favorites');
+                }
+            });
 
             // --- Scroll to Top Logic ---
             window.addEventListener('scroll', () => {
