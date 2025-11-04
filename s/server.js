@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const winston = require('winston');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Joi = require('joi');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
@@ -66,7 +67,19 @@ app.use(rateLimiterMiddleware);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // API Endpoints
+
+const generatePromptSchema = Joi.object({
+    idea: Joi.string().required(),
+    parameters: Joi.object().required(),
+    mode: Joi.string().valid('general', 'no-names', 'base64').required(),
+});
+
 app.post('/api/generate-prompt', async (req, res) => {
+    const { error } = generatePromptSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+
     const { idea, parameters, mode } = req.body;
     const { generationModel } = parameters;
     const model = genAI.getGenerativeModel({ model: generationModel });
@@ -94,8 +107,10 @@ app.post('/api/generate-prompt', async (req, res) => {
             const noNamesResponse = await noNamesResult.response;
             generatedPrompt = noNamesResponse.text();
         } else if (mode === 'base64') {
-            // This is a simplified version. A real implementation would use a library or a more complex regex.
-            generatedPrompt = generatedPrompt.replace(/Harry Potter/gi, btoa('Harry Potter'));
+            // Find all capitalized words (potential names) and encode them
+            generatedPrompt = generatedPrompt.replace(/\b[A-Z][a-z]*\b/g, (match) => {
+                return Buffer.from(match).toString('base64');
+            });
         }
 
         res.json({ generatedPrompt });
@@ -134,6 +149,22 @@ app.post('/api/generate-ideas', async (req, res) => {
     } catch (error) {
         logger.error(error);
         res.status(500).json({ error: 'Failed to generate ideas' });
+    }
+});
+
+app.post('/api/generate-negative-prompt', async (req, res) => {
+    const { positivePrompt, generationModel } = req.body;
+    const model = genAI.getGenerativeModel({ model: generationModel });
+    const prompt = `Based on the following positive prompt, generate a list of relevant negative tags to improve the quality of the generated video. Positive prompt: "${positivePrompt}"`;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const negativeTags = response.text();
+        res.json({ negativeTags });
+    } catch (error) {
+        logger.error(error);
+        res.status(500).json({ error: 'Failed to generate negative prompt' });
     }
 });
 
