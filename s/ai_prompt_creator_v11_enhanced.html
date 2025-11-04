@@ -1348,13 +1348,26 @@
             // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
             // --- Единая функция генерации промпта (DRY) ---
             async function generatePrompt(isSuperImprove = false, mode = null) { // Добавляем 'async'
-                saveToHistory();
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею для видео.', 'warning');
                     return;
                 }
+                saveToHistory();
+                const btn = isSuperImprove ? superImproveBtn : improveBtn;
+                const originalBtnText = btn.innerHTML;
+                const otherBtn = isSuperImprove ? improveBtn : superImproveBtn;
 
+                // --- UI: Показываем спиннер ---
+                btn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" ...>
+                       ... (код иконки) ...
+                    </svg>
+                    ${isSuperImprove ? 'Обработка Gemini...' : 'Обработка Gemini...'}
+                `;
+                btn.disabled = true;
+                otherBtn.disabled = true;
+                
                 // === НАЧАЛО ИСПРАВЛЕНИЯ ===
 
                 // 1. Определяем режим API на основе нажатой кнопки
