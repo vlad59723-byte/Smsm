@@ -1,245 +1,134 @@
-// server.js (Финальная профессиональная версия, совместимая с v11 + Negative Prompt)
+
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const winston = require('winston');
-const Joi = require('joi');
-require('dotenv').config({ path: __dirname + '/.env' }); // Убедитесь, что .env в той же папке
-
-const genAIModule = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-// --- Логирование ---
+// Winston logger setup
 const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console({ format: winston.format.simple() }),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' }),
+    ],
 });
 
-// --- Инициализация Gemini ---
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  logger.error('GEMINI_API_KEY not found in .env file.');
-  process.exit(1);
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
 }
-const genAI = new genAIModule.GoogleGenerativeAI(apiKey);
 
-// --- Rate Limiter ---
-const rateLimiter = new RateLimiterMemory({
-  points: 10, // 10 запросов
-  duration: 60 // в минуту
-});
-const rateLimiterMiddleware = (req, res, next) => {
-  rateLimiter.consume(req.ip)
-    .then(() => next())
-    .catch(() => {
-        logger.warn(`Too Many Requests from ${req.ip}`);
-        res.status(429).send('Too Many Requests');
-    });
-};
-
-// --- Middleware ---
-app.use(helmet());
+// Security and Performance Middleware
 app.use(cors());
-app.use(express.json());
+app.use(helmet());
 app.use(compression());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+
+// Rate Limiting
+const rateLimiter = new RateLimiterMemory({
+    points: 10, // 10 requests
+    duration: 1, // per 1 second by IP
+});
+
+const rateLimiterMiddleware = (req, res, next) => {
+    rateLimiter.consume(req.ip)
+        .then(() => {
+            next();
+        })
+        .catch(() => {
+            res.status(429).send('Too Many Requests');
+        });
+};
+
 app.use(rateLimiterMiddleware);
-app.use(express.static(__dirname)); // Раздача ai_prompt_creator_v11_enhanced.html
 
-// --- Схемы валидации Joi (ИСПРАВЛЕНЫ) ---
-// Схема для /generate-prompt
-const promptSchema = Joi.object({
-  idea: Joi.string().min(3).required(),
-  // "parameters" - это объект, который присылает v11
-  parameters: Joi.object().required(), 
-  mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required()
+// Google Generative AI setup
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// API Endpoints
+app.post('/api/generate-prompt', async (req, res) => {
+    const { idea, parameters, mode } = req.body;
+    const { generationModel } = parameters;
+    const model = genAI.getGenerativeModel({ model: generationModel });
+
+    let prompt = `Generate a detailed prompt for a video generation AI. The user's idea is: "${idea}".`;
+
+    if (parameters) {
+        prompt += " The following parameters are provided:\n";
+        for (const [key, value] of Object.entries(parameters)) {
+            if (value) {
+                prompt += `- ${key}: ${value}\n`;
+            }
+        }
+    }
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let generatedPrompt = response.text();
+
+        // Apply operating mode
+        if (mode === 'no-names') {
+            const noNamesPrompt = `Rewrite the following prompt to avoid using any specific names of people, brands, or characters. Instead, use descriptive language. For example, instead of "Harry Potter", you could say "a young wizard with a lightning scar".\n\nOriginal prompt: "${generatedPrompt}"`;
+            const noNamesResult = await model.generateContent(noNamesPrompt);
+            const noNamesResponse = await noNamesResult.response;
+            generatedPrompt = noNamesResponse.text();
+        } else if (mode === 'base64') {
+            // This is a simplified version. A real implementation would use a library or a more complex regex.
+            generatedPrompt = generatedPrompt.replace(/Harry Potter/gi, btoa('Harry Potter'));
+        }
+
+        res.json({ generatedPrompt });
+    } catch (error) {
+        logger.error(error);
+        res.status(500).json({ error: 'Failed to generate prompt' });
+    }
 });
 
-// Схема для /generate-tags
-const tagsSchema = Joi.object({
-  idea: Joi.string().min(3).required(),
-  prompt: Joi.string().min(10).required(),
-  generationModel: Joi.string().optional() // v11 присылает это
+app.post('/api/translate', async (req, res) => {
+    const { text, generationModel } = req.body;
+    const model = genAI.getGenerativeModel({ model: generationModel });
+    const prompt = `Translate the following text to English: "${text}"`;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const translatedText = response.text();
+        res.json({ translatedText });
+    } catch (error) {
+        logger.error(error);
+        res.status(500).json({ error: 'Failed to translate text' });
+    }
 });
 
-// Схема для /predict-problems
-const problemsSchema = Joi.object({
-  idea: Joi.string().min(3).required(),
-  prompt: Joi.string().min(10).required(),
-  generationModel: Joi.string().optional() // v11 присылает это
+app.post('/api/generate-ideas', async (req, res) => {
+    const { generationModel } = req.body;
+    const model = genAI.getGenerativeModel({ model: generationModel });
+    const prompt = `Generate a creative and interesting idea for a video.`;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const idea = response.text();
+        res.json({ idea });
+    } catch (error) {
+        logger.error(error);
+        res.status(500).json({ error: 'Failed to generate ideas' });
+    }
 });
 
-// --- НОВОЕ: Схема для /generate-negative-prompt ---
-const negativePromptSchema = Joi.object({
-  prompt: Joi.string().min(10).required(),
-  generationModel: Joi.string().optional()
-});
-// --- КОНЕЦ НОВОГО ---
-
-// Middleware для валидации
-const validate = (schema) => (req, res, next) => {
-  const { error } = schema.validate(req.body);
-  if (error) {
-    logger.warn(`Validation error: ${error.details[0].message}`);
-    return res.status(400).json({ error: error.details[0].message });
-  }
-  next();
-};
-
-// --- Обработчик /api/generate-prompt (ИСПРАВЛЕН) ---
-const generatePromptHandler = async (req, res, next) => {
-  try {
-    // 1. ПРАВИЛЬНАЯ ДЕСТРУКТУРИЗАЦИЯ
-    const { idea, parameters, mode } = req.body;
-    const modelName = parameters.generationModel || 'gemini-2.5-flash';
-    const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}`);
-
-    let systemInstruction;
-    if (mode === 'auto-pilot') {
-      // Логика автопилота (она не использует 'parameters', только 'idea',
-      // поэтому она работала у вас и раньше)
-      systemInstruction = `
-        Вы — элитный режиссер...
-        ИДЕЯ ПОЛЬЗОВАТЕЛЯ: "${idea}"
-        ВАША ЗАДАЧА: ...САМОСТОЯТЕЛЬНО выберите...
-        5. Отвечайте только финальным промптом.
-      `;
-    } else {
-      // 2. ПРАВИЛЬНАЯ ЛОГИКА для 'improve' и 'super-improve'
-      // Мы передаем *ВЕСЬ* объект 'parameters', а не undefined переменные
-      systemInstruction = `
-        Вы — эксперт по созданию профессиональных...
-        ИСХОДНЫЕ ДАННЫЕ:
-        Базовая идея: "${idea}"
-        Режим: ${mode === 'super-improve' ? 'Максимально детализировать' : 'Улучшить'}
-        
-        // 3. ВОТ ИСПРАВЛЕНИЕ:
-        Параметры: ${JSON.stringify(parameters, null, 2)}
-        
-        ПРАВИЛА ГЕНЕРАЦИИ:
-        1. Объедините все параметры в одно, связное, художественное описание.
-        ...
-        6. Отвечайте только финальным промптом.
-      `;
-    }
-
-    const result = await model.generateContent(systemInstruction);
-    const generatedPrompt = result.response.text().trim();
-    res.json({ generatedPrompt });
-    logger.info('Prompt generated successfully');
-  } catch (error) {
-    next(error); // Передача в централизованный обработчик
-  }
-};
-
-// --- Обработчик /api/generate-tags (ИСПРАВЛЕН) ---
-const generateTagsHandler = async (req, res, next) => {
-  try {
-    const { idea, prompt, generationModel } = req.body;
-    const modelName = generationModel || 'gemini-2.5-flash';
-    const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Tags): ${modelName}`);
-
-    const generationPrompt = `
-        Вы — ассистент по промпт-инжинирингу.
-        Идея: "${idea}"
-        Уже сгенерированный промпт: "${prompt}"
-
-        ЗАДАЧА: Предложите 5-7 дополнительных, релевантных тегов (через запятую), которые УЖЕ НЕ ВСТРЕЧАЮТСЯ в промпте, но могут его улучшить (например: "8K, ray tracing, subsurface scattering, masterpiece").
-        ОТВЕТ: Только список тегов через запятую.
-    `;
-
-    const result = await model.generateContent(generationPrompt);
-    const generatedTags = result.response.text().trim();
-    res.json({ generatedTags });
-    logger.info('Tags generated successfully');
-  } catch (error) {
-    next(error);
-  }
-};
-
-// --- Обработчик /api/predict-problems (ИСПРАВЛЕН) ---
-const predictProblemsHandler = async (req, res, next) => {
-  try {
-    const { idea, prompt, generationModel } = req.body;
-    const modelName = generationModel || 'gemini-2.5-flash';
-    const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Problems): ${modelName}`);
-
-    const generationPrompt = `
-        Вы — QA-тестировщик для ИИ-генераторов видео.
-        Промпт для анализа: "${prompt}"
-
-        ЗАДАЧА: Какие 3-5 главных визуальных проблем (артефактов) могут возникнуть при генерации этого промпта?
-        ОТВЕТ: Напишите список ключевых слов для НЕГАТИВНОГО промпта, чтобы избежать этих проблем (например: "low quality, blurry, bad anatomy, text, watermark, artifacts").
-        Отвечайте только списком тегов через запятую.
-    `;
-    
-    const result = await model.generateContent(generationPrompt);
-    const predictedProblems = result.response.text().trim();
-    res.json({ predictedProblems });
-    logger.info('Problems predicted successfully');
-  } catch (error) {
-    next(error);
-  }
-};
-
-// --- НОВОЕ: Обработчик /api/generate-negative-prompt ---
-const generateNegativePromptHandler = async (req, res, next) => {
-  try {
-    const { prompt, generationModel } = req.body;
-    const modelName = generationModel || 'gemini-2.5-flash';
-    const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Negative Prompt): ${modelName}`);
-
-    const generationPrompt = `
-        Вы — эксперт по негативным промптам для ИИ-генераторов видео.
-        ПОЗИТИВНЫЙ ПРОМПТ: "${prompt}"
-
-        ЗАДАЧА: Сгенерируйте краткий список (5-10) ключевых слов для НЕГАТИВНОГО промпта, чтобы избежать распространенных ошибок генерации (артефактов, размытия, плохого качества, деформаций), которые могут возникнуть с этим стилем.
-        ОТВЕТ: Только список тегов через запятую.
-    `;
-    
-    const result = await model.generateContent(generationPrompt);
-    const generatedNegative = result.response.text().trim();
-    res.json({ generatedNegative });
-    logger.info('Negative prompt generated successfully');
-  } catch (error) {
-    next(error);
-  }
-};
-// --- КОНЕЦ НОВОГО ---
-
-
-// --- Маршруты ---
-app.post('/api/generate-prompt', validate(promptSchema), generatePromptHandler);
-app.post('/api/generate-tags', validate(tagsSchema), generateTagsHandler);
-app.post('/api/predict-problems', validate(problemsSchema), predictProblemsHandler);
-
-// --- НОВОЕ: Регистрация маршрута ---
-app.post('/api/generate-negative-prompt', validate(negativePromptSchema), generateNegativePromptHandler);
-// --- КОНЕЦ НОВОГО ---
-
-
-// --- Централизованная обработка ошибок ---
-app.use((err, req, res, next) => {
-  logger.error(`Unhandled Error: ${err.message}`, { stack: err.stack, ip: req.ip });
-  res.status(500).json({ error: 'Internal Server Error' });
-});
-
-// --- Запуск сервера ---
 app.listen(port, () => {
-  logger.info(`Production-ready server listening at http://localhost:${port}`);
+    logger.info(`Server is running on http://localhost:${port}`);
 });
