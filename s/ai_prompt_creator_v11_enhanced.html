@@ -183,14 +183,57 @@
                         <button data-preset="lovecraft-horror" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Хоррор (Лавкрафт)</button>
                         <button data-preset="sci-fi-retro" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Н/ф (Ретро 70-х)</button>
                         <button data-preset="romantic-scene" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Романтика</button>
+                        <button data-preset="3d-modeling" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">3D-моделирование</button>
+                        <button data-preset="cinematic-noir" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Кинематографическое Нуар</button>
+                        <button data-preset="cel-shaded-comic" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Стилизованный Комикс</button>
+                        <button data-preset="street-photography" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Уличная Фотография</button>
+                        <button data-preset="steampunk" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Стимпанк</button>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">Нажмите, чтобы автоматически заполнить все параметры.</p>
+                    <div class="mt-4" id="custom-presets-container"></div>
+                    <button id="create-preset-btn" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition-colors duration-200 text-sm font-medium">Создать свой пресет</button>
                 </div>
                 <!-- End Presets Section -->
+                <!-- Detail Level Section -->
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-5 text-gray-800">2.5. Уровень Детализации:</h3>
+                    <div class="flex flex-wrap gap-3" id="detail-level-buttons">
+                        <button data-level="basic" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Basic</button>
+                        <button data-level="detailed" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Detailed</button>
+                        <button data-level="masterpiece" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Masterpiece</button>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-3">Добавляет теги качества в поле "Дополнительные детали".</p>
+                </div>
+                <!-- End Detail Level Section -->
+
+                <!-- Operating Modes Section -->
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-5 text-gray-800">3. Режим Работы:</h3>
+                    <select id="operating-mode" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="general" selected>Общий (по умолчанию)</option>
+                        <option value="no-names">"Без имен"</option>
+                        <option value="base64">"Base64 кодирование"</option>
+                    </select>
+                    <p class="text-sm text-gray-500 mt-3">Выберите режим для обработки чувствительных элементов в промпте.</p>
+                </div>
+                <!-- End Operating Modes Section -->
 
 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
-                    <label for="idea-input" class="text-xl font-semibold mb-4 text-gray-800 block">3. Введите вашу идею:</label>
-                    <textarea id="idea-input" class="w-full min-h-[120px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: Наруто против Саске"></textarea>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">4. Введите вашу идею:</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="subject-input" class="block text-sm font-medium text-gray-700">Субъект/Объект (О чем/ком):</label>
+                            <textarea id="subject-input" class="w-full min-h-[80px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: киберпанк-ниндзя"></textarea>
+                        </div>
+                        <div>
+                            <label for="style-lighting-input" class="block text-sm font-medium text-gray-700">Стиль/Освещение:</label>
+                            <textarea id="style-lighting-input" class="w-full min-h-[80px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: в стиле нуар, неоновое освещение"></textarea>
+                        </div>
+                        <div>
+                            <label for="quality-resolution-input" class="block text-sm font-medium text-gray-700">Качество/Разрешение:</label>
+                            <textarea id="quality-resolution-input" class="w-full min-h-[80px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: 8k, Masterpiece, Cinematic"></textarea>
+                        </div>
+                    </div>
                     
                     <div class="flex flex-col sm:flex-row gap-3 mt-4">
                         <button id="improve-btn" class="primary-btn flex-1 px-8 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
@@ -225,7 +268,7 @@
                 <!-- Duration Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xl font-semibold text-gray-800">4. Длительность (секунды):</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">5. Длительность (секунды):</h3>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-duration" class="toggle-checkbox hidden" checked>
                             <span class="toggle-label"></span>
@@ -295,6 +338,7 @@
                                 <label for="anime-manga-input" class="block text-sm font-medium text-gray-700">Тайтл/Манга (опционально):</label>
                                 <input type="text" id="anime-manga-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Например: Attack on Titan, One Piece">
                             </div>
+                            <button id="reset-anime-btn" class="mt-4 w-full px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600 transition-colors duration-200 text-sm font-medium">Сбросить аниме-параметры</button>
                         </div>
                     </div>
 
@@ -440,7 +484,7 @@
                 <!-- Details Section -->
                 <div class="mt-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xl font-semibold text-gray-800">5. Дополнительные детали (Теги):</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">6. Дополнительные детали (Теги):</h3>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-details" class="toggle-checkbox hidden" checked>
                             <span class="toggle-label"></span>
@@ -452,6 +496,7 @@
                                 <button id="suggest-tags-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 transition-all duration-200">
                                     🤖 Подобрать теги
                                 </button>
+                                <input type="number" id="details-weight" class="w-24 p-2 border border-gray-300 rounded-lg" placeholder="Вес" step="0.1" min="0" max="2">
                             </div>
                         
                         <div class="mt-4">
@@ -494,18 +539,28 @@
                 <!-- Negative Prompt Section -->
                 <div class="mt-8 p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xl font-semibold text-red-800">6. Негативный Промпт (Что исключить):</h3>
+                        <h3 class="text-xl font-semibold text-red-800">7. Негативный Промпт (Что исключить):</h3>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-negative" class="toggle-checkbox hidden" checked>
                             <span class="toggle-label bg-red-500"></span>
                         </label>
                     </div>
                     <div class="param-content">
-                        
-                            <div class="mb-4">
-                                <label for="anti-prompt-input" class="block text-sm font-medium text-gray-700 mb-2">Что вы НЕ хотите видеть? (Опишите простыми словами)</label>
-                                <textarea id="anti-prompt-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Например: не хочу мультяшность, кривые руки, водяные знаки"></textarea>
-                            </div><textarea id="negative-prompt-textarea" class="w-full min-h-[100px] p-4 border border-red-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" placeholder="Введите теги, которые нужно исключить, например: low quality, blurry, watermark"></textarea>
+                        <div class="mb-4 space-y-2" id="negative-prompt-groups">
+                            <label class="flex items-center">
+                                <input type="checkbox" data-group="standard" class="form-checkbox h-5 w-5 text-red-600">
+                                <span class="ml-2 text-gray-700">Standard Block (руки, низкое качество, размытость)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" data-group="anime" class="form-checkbox h-5 w-5 text-red-600">
+                                <span class="ml-2 text-gray-700">Anime Block (текст, водяные знаки, низкий рейтинг)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" data-group="realistic" class="form-checkbox h-5 w-5 text-red-600">
+                                <span class="ml-2 text-gray-700">Realistic Block (две головы, уродливая кожа, деформированное тело)</span>
+                            </label>
+                        </div>
+                        <textarea id="negative-prompt-textarea" class="w-full min-h-[100px] p-4 border border-red-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" placeholder="Введите теги, которые нужно исключить, например: low quality, blurry, watermark"></textarea>
                             <div class="mt-3 flex gap-2">
                                 <button id="generate-negative-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-red-600 hover:to-orange-600 transition-all duration-200">
                                     🤖 Сгенерировать негатив
@@ -513,6 +568,7 @@
                                 <button id="predict-problems-btn" class="flex-1 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-semibold rounded-lg shadow-md hover:from-gray-700 hover:to-gray-800 transition-all duration-200">
                                     🤖 Предсказать проблемы
                                 </button>
+                                <input type="number" id="negative-weight" class="w-24 p-2 border border-gray-300 rounded-lg" placeholder="Вес" step="0.1" min="0" max="2">
                             </div>
                         
                         <div class="mt-4">
@@ -553,7 +609,7 @@
 
                 <!-- Result Section -->
                 <div id="result-section" class="mt-12 p-6 bg-white rounded-xl shadow-2xl hidden">
-                    <h3 class="text-2xl font-bold mb-4 text-blue-600">7. Готовый Промпт:</h3>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-600">8. Готовый Промпт:</h3>
                     <textarea id="prompt-output" readonly class="w-full min-h-[300px] p-4 border-2 border-blue-300 rounded-lg text-base bg-gray-50 font-mono resize-none"></textarea>
                     <!-- Prompt Quality Score Panel -->
                     <div id="quality-panel" class="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-lg hidden">
@@ -607,6 +663,12 @@
         <!-- Notifications will appear here -->
     </div>
 
+    <button id="scroll-to-top" class="hidden fixed bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
@@ -637,7 +699,9 @@
             let undoState = null; // Для функции "Отменить сброс"
 
             // --- Элементы DOM ---
-            const ideaInput = document.getElementById('idea-input');
+            const subjectInput = document.getElementById('subject-input');
+            const styleLightingInput = document.getElementById('style-lighting-input');
+            const qualityResolutionInput = document.getElementById('quality-resolution-input');
             const improveBtn = document.getElementById('improve-btn');
             const superImproveBtn = document.getElementById('super-improve-btn');
             const resetParamsBtn = document.getElementById('reset-params-btn');
@@ -670,6 +734,14 @@
             const negativeTagContainer = document.getElementById('negative-tags-container');
             const toggleCheckboxes = document.querySelectorAll('.toggle-checkbox');
             const parameterGroups = document.querySelectorAll('.parameter-group');
+            const detailLevelButtons = document.querySelectorAll('.detail-level-btn');
+            const scrollToTopBtn = document.getElementById('scroll-to-top');
+            const createPresetBtn = document.getElementById('create-preset-btn');
+            const customPresetsContainer = document.getElementById('custom-presets-container');
+            const resetAnimeBtn = document.getElementById('reset-anime-btn');
+            const operatingModeSelect = document.getElementById('operating-mode');
+            const translateToEnglishBtn = document.getElementById('translate-to-english-btn');
+            const generateIdeasBtn = document.getElementById('generate-ideas-btn');
 
             // --- Расширенные карты параметров ---
             const styleMap = {
@@ -1109,6 +1181,21 @@
                 },
                 'romantic-scene': {
                     style: 'realistic', camera: 'close-up', lighting: 'sunset', cinematography: '21:9', mood: 'romantic', effect: 'bokeh', background: 'beach-ocean', audio: 'acoustic-guitar', details: 'Golden hour, Soft focus, Bokeh, Lens flare, Emotional, Warm colors, Shallow depth of field', negative: 'dark, horror, tense, sad, ugly'
+                },
+                '3d-modeling': {
+                    style: 'animation-3d', camera: 'medium-shot', lighting: 'studio-light', cinematography: '16:9', mood: 'futuristic', effect: 'none', background: 'abstract-geometric', audio: 'electronic-trance', details: 'octane render, unreal engine 5, high poly, smooth shading', negative: 'low quality, blurry, 2d, drawing'
+                },
+                'cinematic-noir': {
+                    style: 'noir', camera: 'low-angle', lighting: 'cinematic', cinematography: '21:9', mood: 'mysterious', effect: 'smoke-fog', background: 'rainy-alley', audio: 'jazz', details: 'cinematic light, volumetric light, rim lighting, low key, shadowplay, contrast', negative: 'color, bright, happy, soft lighting'
+                },
+                'cel-shaded-comic': {
+                    style: 'comic-book', camera: 'dutch-angle', lighting: 'hard', cinematography: '16:9', mood: 'action', effect: 'none', background: 'urban-city', audio: 'rock', details: 'cel-shaded, comic book style, ink lines, vibrant colors, halftone effect', negative: 'realistic, photorealistic, soft shading, blurry'
+                },
+                'street-photography': {
+                    style: 'realistic', camera: 'handheld', lighting: 'natural', cinematography: '4:3', mood: 'nostalgic', effect: 'film-grain', background: 'urban-city', audio: 'ambient', details: 'Fujifilm X-T4, 35mm lens, candid shot, grainy photo, shallow depth of field', negative: 'vfx, stylized, cartoon, low quality, studio lighting'
+                },
+                'steampunk': {
+                    style: 'steampunk', camera: 'medium-shot', lighting: 'warm', cinematography: '16:9', mood: 'historical', effect: 'smoke-fog', background: 'abandoned-factory', audio: 'ambient', details: 'steampunk aesthetic, brass, gears, cogs, Victorian era, goggles', negative: 'modern, futuristic, plastic, minimalist'
                 }
             };
             // --- Конец расширенных карт параметров ---
@@ -1227,7 +1314,7 @@
             // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
             // --- Единая функция генерации промпта (DRY) ---
             async function generatePrompt(isSuperImprove = false, mode = null) { // Добавляем 'async'
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею для видео.', 'warning');
                     return;
@@ -1264,7 +1351,7 @@
                         body: JSON.stringify({ 
                             idea: idea, 
                             parameters: parameters, // Отправляем собранные параметры
-                            mode: mode ? mode : (isSuperImprove ? 'super-improve' : 'improve')
+                            mode: operatingModeSelect.value
                         })
                     });
 
@@ -1657,12 +1744,163 @@
                 saveState();
             }
 
+            // --- Custom Presets Logic ---
+            const CUSTOM_PRESETS_KEY = 'aiPromptCreatorCustomPresetsV11';
+
+            function saveCustomPreset() {
+                const presetName = prompt("Введите имя для вашего пресета:", "Мой пресет");
+                if (!presetName) return;
+
+                const state = {
+                    model: document.querySelector('input[name="model"]:checked').value,
+                    enableModelSelection: enableModelSelectionCheckbox.checked,
+                    subject: subjectInput.value,
+                    styleLighting: styleLightingInput.value,
+                    qualityResolution: qualityResolutionInput.value,
+                    operatingMode: operatingModeSelect.value,
+                    style: styleSelect.value,
+                    camera: document.getElementById('camera').value,
+                    lighting: document.getElementById('lighting').value,
+                    cinematography: document.getElementById('cinematography').value,
+                    mood: document.getElementById('mood').value,
+                    effect: document.getElementById('effect').value,
+                    background: document.getElementById('background').value,
+                    audio: document.getElementById('audio').value,
+                    details: detailsTextarea.value,
+                    negative: negativePromptTextarea.value,
+                    duration: durationSlider.value,
+                    customDurationChecked: customDurationToggle.checked,
+                    selectedDurationButton: document.querySelector('.duration-btn.bg-blue-500')?.dataset.duration || '10',
+                    animeStudio: animeStudioSelect.value,
+                    animeStyle: animeStyleSelect.value,
+                    animeManga: animeMangaInput.value,
+                    toggles: {}
+                };
+
+                toggleCheckboxes.forEach(checkbox => {
+                    state.toggles[checkbox.id] = checkbox.checked;
+                });
+
+                const customPresets = JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY)) || [];
+                customPresets.push({ name: presetName, state: state });
+                localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(customPresets));
+
+                loadCustomPresets();
+                showNotification(`Пресет "${presetName}" сохранен!`, 'success');
+            }
+
+            function loadCustomPresets() {
+                const customPresets = JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY)) || [];
+                customPresetsContainer.innerHTML = '';
+
+                if (customPresets.length > 0) {
+                    const title = document.createElement('h4');
+                    title.className = 'text-md font-semibold mb-2 text-gray-700';
+                    title.textContent = 'Ваши пресеты:';
+                    customPresetsContainer.appendChild(title);
+
+                    const presetGrid = document.createElement('div');
+                    presetGrid.className = 'flex flex-wrap gap-3';
+
+                    customPresets.forEach((preset, index) => {
+                        const presetWrapper = document.createElement('div');
+                        presetWrapper.className = 'relative';
+
+                        const btn = document.createElement('button');
+                        btn.textContent = preset.name;
+                        btn.className = 'custom-preset-btn px-4 py-2 bg-green-100 text-green-800 rounded-lg shadow-sm hover:bg-green-200 transition-colors duration-200 text-sm font-medium';
+                        btn.addEventListener('click', () => applyCustomPreset(preset.state));
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.innerHTML = '&times;';
+                        deleteBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold hover:bg-red-600';
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteCustomPreset(index);
+                        });
+
+                        presetWrapper.appendChild(btn);
+                        presetWrapper.appendChild(deleteBtn);
+                        presetGrid.appendChild(presetWrapper);
+                    });
+                    customPresetsContainer.appendChild(presetGrid);
+                }
+            }
+
+            function applyCustomPreset(state) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                loadState(false);
+                showNotification('Пользовательский пресет применен!', 'success');
+            }
+
+            function deleteCustomPreset(index) {
+                if (!confirm("Вы уверены, что хотите удалить этот пресет?")) return;
+
+                const customPresets = JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY)) || [];
+                customPresets.splice(index, 1);
+                localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(customPresets));
+
+                loadCustomPresets();
+                showNotification('Пресет удален.', 'info');
+            }
+
+            function resetAnimeParameters() {
+                animeStudioSelect.value = '';
+                animeStyleSelect.value = '';
+                animeMangaInput.value = '';
+                showNotification('Параметры аниме сброшены.', 'info');
+                saveState();
+            }
+
+            async function translateToEnglish() {
+                const prompt = promptOutput.value;
+                if (!prompt) {
+                    showNotification('Сначала сгенерируйте промпт.', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/translate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            text: prompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+                    const data = await response.json();
+                    promptOutput.value = data.translatedText;
+                    showNotification('Промпт переведен на английский.', 'success');
+                } catch (error) {
+                    showNotification('Ошибка перевода.', 'error');
+                }
+            }
+
+            async function generateIdeas() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/generate-ideas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+                    const data = await response.json();
+                    subjectInput.value = data.idea;
+                    showNotification('Новая идея сгенерирована!', 'success');
+                } catch (error) {
+                    showNotification('Ошибка генерации идей.', 'error');
+                }
+            }
+
             // --- Local Storage Functions ---
             function saveState() {
                 const state = {
                     model: document.querySelector('input[name="model"]:checked').value,
                     enableModelSelection: enableModelSelectionCheckbox.checked,
-                    idea: ideaInput.value,
+                    subject: subjectInput.value,
+                    styleLighting: styleLightingInput.value,
+                    qualityResolution: qualityResolutionInput.value,
                     style: styleSelect.value,
                     camera: document.getElementById('camera').value,
                     lighting: document.getElementById('lighting').value,
@@ -1701,7 +1939,10 @@
                     }
                     
                     // Текстовые поля
-                    ideaInput.value = state.idea;
+                    subjectInput.value = state.subject || '';
+                    styleLightingInput.value = state.styleLighting || '';
+                    qualityResolutionInput.value = state.qualityResolution || '';
+                    operatingModeSelect.value = state.operatingMode || 'general';
                     detailsTextarea.value = state.details;
                     negativePromptTextarea.value = state.negative;
 
@@ -1829,6 +2070,7 @@
             
             // Инициализация
             loadState(); // Загружаем состояние при старте
+            loadCustomPresets(); // Загружаем пользовательские пресеты
             toggleModelSelection(); // Устанавливаем начальное состояние выбора модели
             toggleAudioSelector(); // Устанавливаем начальное состояние аудиоселектора
             toggleAnimeOptions(); // Устанавливаем начальное состояние аниме-секции
@@ -2032,6 +2274,84 @@
 
             // --- "Predict Problems" feature ---
             const predictProblemsBtn = document.getElementById('predict-problems-btn');
+            const negativePromptGroups = document.getElementById('negative-prompt-groups');
+
+            const negativeTagGroups = {
+                standard: ['bad hands', 'low quality', 'blurry'],
+                anime: ['text', 'watermark', 'low rating'],
+                realistic: ['two heads', 'ugly skin', 'deformed body']
+            };
+
+            function updateNegativePromptFromGroups() {
+                let activeTags = new Set();
+                const checkboxes = negativePromptGroups.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const group = checkbox.dataset.group;
+                        negativeTagGroups[group].forEach(tag => activeTags.add(tag));
+                    }
+                });
+                negativePromptTextarea.value = [...activeTags].join(', ');
+                saveState();
+            }
+
+            negativePromptGroups.addEventListener('change', updateNegativePromptFromGroups);
+
+            function applyWeight(textarea, weightInput) {
+                let currentText = textarea.value.trim();
+                if (currentText.endsWith(',')) {
+                    currentText = currentText.slice(0, -1).trim();
+                }
+                const tags = currentText.split(',').map(t => t.trim());
+                const lastTag = tags[tags.length - 1];
+                const weight = parseFloat(weightInput.value);
+
+                if (lastTag && !lastTag.includes(':') && weight > 0) {
+                    tags[tags.length - 1] = `(${lastTag}:${weight})`;
+                    textarea.value = tags.join(', ');
+                    saveState();
+                }
+            }
+
+            document.getElementById('details-weight').addEventListener('change', () => {
+                applyWeight(detailsTextarea, document.getElementById('details-weight'));
+            });
+
+            document.getElementById('negative-weight').addEventListener('change', () => {
+                applyWeight(negativePromptTextarea, document.getElementById('negative-weight'));
+            });
+
+            function handleDetailLevelClick(event) {
+                const level = event.currentTarget.dataset.level;
+                const tags = {
+                    basic: ['high quality', 'detailed'],
+                    detailed: ['masterpiece', 'best quality', 'highly detailed', 'photorealistic', 'cinematic light'],
+                    masterpiece: ['ultra-detailed', '8k', 'extremely detailed face', 'volumetric light', 'trending on artstation', 'unreal engine 5', 'octane render']
+                };
+
+                let currentText = detailsTextarea.value.trim();
+                const tagsToAdd = tags[level];
+
+                tagsToAdd.forEach(tag => {
+                    const tagRegex = new RegExp(`\\b${tag.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+                    if (!tagRegex.test(currentText)) {
+                        if (currentText.length > 0 && !currentText.endsWith(',')) {
+                            currentText += ', ';
+                        } else if (currentText.length > 0) {
+                            currentText += ' ';
+                        }
+                        currentText += tag;
+                    }
+                });
+
+                detailsTextarea.value = currentText;
+                showNotification(`Теги уровня "${level}" добавлены.`, 'success');
+                saveState();
+            }
+
+            detailLevelButtons.forEach(btn => {
+                btn.addEventListener('click', handleDetailLevelClick);
+            });
 
             async function handlePredictProblems() {
                 const idea = ideaInput.value.trim();
@@ -2090,6 +2410,26 @@
             }
 
             predictProblemsBtn.addEventListener('click', handlePredictProblems);
+            createPresetBtn.addEventListener('click', saveCustomPreset);
+            resetAnimeBtn.addEventListener('click', resetAnimeParameters);
+            translateToEnglishBtn.addEventListener('click', translateToEnglish);
+            generateIdeasBtn.addEventListener('click', generateIdeas);
+
+            // --- Scroll to Top Logic ---
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    scrollToTopBtn.classList.remove('hidden');
+                } else {
+                    scrollToTopBtn.classList.add('hidden');
+                }
+            });
+
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>
