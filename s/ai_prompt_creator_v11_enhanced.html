@@ -2531,6 +2531,7 @@
                     let currentNegativeText = negativePromptTextarea.value.trim();
                     if (currentNegativeText.length > 0 && !currentNegativeText.endsWith(',')) {
                         currentNegativeText += ', ';
+                    } // <--- ВОТ ИСПРАВЛЕНИЕ
                     negativePromptTextarea.value = currentNegativeText + data.negativeTags;
                     showNotification('Негативные теги сгенерированы.', 'success');
                 } catch (error) {
