@@ -306,7 +306,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- Стиль Видео -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="style-section" class="p-6 bg-blue-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Стиль Видео:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -315,7 +315,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                               
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="style">🤖 Предложить стиль</button>
@@ -353,7 +353,7 @@
                     </div>
 
                     <!-- План/Движение Камеры -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="camera-section" class="p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">План/Движение Камеры:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -362,7 +362,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="camera" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="camera" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                                 
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="camera">🤖 Предложить движение камеры</button>
@@ -370,7 +370,7 @@
                     </div>
 
                     <!-- Освещение -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="lighting-section" class="p-6 bg-yellow-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Освещение:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -379,7 +379,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="lighting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="lighting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                                 
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="lighting">🤖 Предложить освещение</button>
@@ -1327,6 +1327,20 @@
                 }
                 return prompt;
             }
+
+            function formatPromptOutput(prompt) {
+                // Check for flags and format accordingly
+                const flags = prompt.match(/--[a-z]+\s\d+:\d+/g);
+                if (flags) {
+                    let formattedPrompt = prompt;
+                    flags.forEach(flag => {
+                        formattedPrompt = formattedPrompt.replace(flag, `\n- ${flag}`);
+                    });
+                    return formattedPrompt;
+                }
+                // Default to bullet points for comma-separated values
+                return prompt.split(',').map(item => `- ${item.trim()}`).join('\n');
+            }
             
             function toggleModelSelection() {
                 const isEnabled = enableModelSelectionCheckbox.checked;
@@ -1488,7 +1502,7 @@
                     const data = await response.json();
                     
                     // 5. Отображение результата от Gemini
-                    promptOutput.value = data.generatedPrompt;
+                    promptOutput.value = formatPromptOutput(data.generatedPrompt);
                     resultSection.style.display = 'block';
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
@@ -2039,11 +2053,11 @@
                 let html = '';
 
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
-                html += `<span class="text-green-600">${idea}</span>`;
+                html += `<span class="text-blue-600">${idea}</span>`;
 
                 for (const [key, value] of Object.entries(parameters)) {
                     if (value) {
-                        html += `, <span class="text-blue-600">${key}: ${value}</span>`;
+                        html += `, <span class="text-green-600">${key}: ${value}</span>`;
                     }
                 }
 
@@ -2263,9 +2277,9 @@
                     }
 
                     if (matchCount >= 2) {
-                        btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500', 'transition-all', 'duration-200');
+                        btn.classList.add('bg-yellow-200');
                     } else {
-                        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500');
+                        btn.classList.remove('bg-yellow-200');
                     }
                 });
             }
