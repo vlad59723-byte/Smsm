@@ -1,4 +1,4 @@
-// server.js (Финальная профессиональная версия, V11 + Вспомогательные функции)
+// server.js (Финальная профессиональная версия, V11 + Интеграция Режимов Работы)
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
@@ -7,6 +7,8 @@ const { RateLimiterMemory } = require('rate-limiter-flexible');
 const winston = require('winston');
 const Joi = require('joi');
 require('dotenv').config({ path: __dirname + '/.env' }); // Убедитесь, что .env в той же папке
+
+// ВАЖНО: Buffer используется для 'base64', но это встроенный модуль Node.js, импорт не нужен.
 
 const genAIModule = require('@google/generative-ai');
 
@@ -38,7 +40,7 @@ const genAI = new genAIModule.GoogleGenerativeAI(apiKey);
 // --- Rate Limiter ---
 const rateLimiter = new RateLimiterMemory({
   points: 10, // 10 запросов
-  duration: 60 // в минуту
+  duration: 60 // в минуту (в V11 было 60 сек, во втором файле 1 сек. 60 безопаснее)
 });
 const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)
@@ -58,57 +60,56 @@ app.use(rateLimiterMiddleware);
 app.use(express.static(__dirname)); // Раздача ai_prompt_creator_v11_enhanced.html
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
+    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
 });
 
 app.get('/data.js', (req, res) => {
-    res.sendFile(__dirname + '/data.js');
+    res.sendFile(__dirname + '/data.js');
 });
 
 
 // --- Схемы валидации Joi ---
 
-// Схема для /generate-prompt
+// Схема для /generate-prompt (из V11)
 const promptSchema = Joi.object({
   idea: Joi.string().min(3).required(),
   parameters: Joi.object().required(), 
   mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required(),
-  // ДОБАВЛЕНО: Валидация для "Режима Работы"
   operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional()
 });
 
-// Схема для /generate-tags
+// Схема для /generate-tags (из V11)
 const tagsSchema = Joi.object({
   idea: Joi.string().min(3).required(),
   prompt: Joi.string().min(10).required(),
   generationModel: Joi.string().optional()
 });
 
-// Схема для /predict-problems
+// Схема для /predict-problems (из V11)
 const problemsSchema = Joi.object({
   idea: Joi.string().min(3).required(),
   prompt: Joi.string().min(10).required(),
   generationModel: Joi.string().optional()
 });
 
-// Схема для /generate-negative-prompt
+// Схема для /generate-negative-prompt (из V11)
 const negativePromptSchema = Joi.object({
-  prompt: Joi.string().min(10).required(),
+  prompt: Joi.string().min(10).required(), // V11 использует 'prompt', второй файл 'positivePrompt'. 'prompt' универсальнее.
   generationModel: Joi.string().optional()
 });
 
-// --- НОВОЕ: Схема для /translate ---
+// Схема для /translate (из V11)
 const translateSchema = Joi.object({
   text: Joi.string().min(1).required(),
   generationModel: Joi.string().optional()
 });
 
-// --- НОВОЕ: Схема для /generate-ideas ---
+// Схема для /generate-ideas (из V11)
 const ideasSchema = Joi.object({
   generationModel: Joi.string().optional()
 });
 
-// Middleware для валидации
+// Middleware для валидации (из V11)
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
   if (error) {
@@ -120,14 +121,15 @@ const validate = (schema) => (req, res, next) => {
 
 // --- Обработчики API ---
 
-// Обработчик /api/generate-prompt
+// Обработчик /api/generate-prompt (V11 + Логика из второго файла)
 const generatePromptHandler = async (req, res, next) => {
   try {
-    const { idea, parameters, mode, operatingMode } = req.body; // <-- Добавлен operatingMode
+    const { idea, parameters, mode, operatingMode } = req.body; 
     const modelName = parameters.generationModel || 'gemini-2.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
-    logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}`);
+    logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}, OperatingMode: ${operatingMode}`);
 
+    // --- Логика V11 (Режим 'auto-pilot' / 'improve') ---
     let systemInstruction;
     if (mode === 'auto-pilot') {
       systemInstruction = `
@@ -152,7 +154,27 @@ const generatePromptHandler = async (req, res, next) => {
     }
 
     const result = await model.generateContent(systemInstruction);
-    const generatedPrompt = result.response.text().trim();
+    let generatedPrompt = result.response.text().trim(); // Используем let для возможности изменения
+
+    // --- ДОБАВЛЕНО: Логика "Режима Работы" из второго файла ---
+    if (operatingMode === 'no-names') {
+        logger.info('Applying no-names filter...');
+        const noNamesPrompt = `Rewrite the following prompt to avoid using any specific names of people, brands, or characters. Instead, use descriptive language. For example, instead of "Harry Potter", you could say "a young wizard with a lightning scar". Respond only with the rewritten prompt.\n\nOriginal prompt: "${generatedPrompt}"`;
+        
+        // Используем ту же модель
+        const noNamesResult = await model.generateContent(noNamesPrompt);
+        generatedPrompt = noNamesResult.response.text().trim();
+
+    } else if (operatingMode === 'base64') {
+        logger.info('Applying base64 filter...');
+        // Логика из второго файла для кодирования
+        generatedPrompt = generatedPrompt.replace(/\b[A-Z][a-z]{2,}\b/g, (match) => {
+            // Ищем слова с большой буквы (длиннее 2 символов) как потенциальные имена
+            return Buffer.from(match).toString('base64');
+        });
+    }
+    // --- Конец добавленной логики ---
+
     res.json({ generatedPrompt });
     logger.info('Prompt generated successfully');
   } catch (error) {
@@ -160,7 +182,7 @@ const generatePromptHandler = async (req, res, next) => {
   }
 };
 
-// Обработчик /api/generate-tags
+// Обработчик /api/generate-tags (из V11)
 const generateTagsHandler = async (req, res, next) => {
   try {
     const { idea, prompt, generationModel } = req.body;
@@ -186,7 +208,7 @@ const generateTagsHandler = async (req, res, next) => {
   }
 };
 
-// Обработчик /api/predict-problems
+// Обработчик /api/predict-problems (из V11)
 const predictProblemsHandler = async (req, res, next) => {
   try {
     const { idea, prompt, generationModel } = req.body;
@@ -212,10 +234,10 @@ const predictProblemsHandler = async (req, res, next) => {
   }
 };
 
-// Обработчик /api/generate-negative-prompt
+// Обработчик /api/generate-negative-prompt (из V11, т.к. промпт лучше)
 const generateNegativePromptHandler = async (req, res, next) => {
   try {
-    const { prompt, generationModel } = req.body;
+    const { prompt, generationModel } = req.body; // Используем { prompt } из V11
     const modelName = generationModel || 'gemini-2.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
     logger.info(`Using model (Negative Prompt): ${modelName}`);
@@ -237,7 +259,7 @@ const generateNegativePromptHandler = async (req, res, next) => {
   }
 };
 
-// --- НОВОЕ: Обработчик /api/translate ---
+// Обработчик /api/translate (из V11, т.к. промпт лучше)
 const translateHandler = async (req, res, next) => {
     try {
         const { text, generationModel } = req.body;
@@ -250,11 +272,11 @@ const translateHandler = async (req, res, next) => {
         res.json({ translatedText });
         logger.info('Text translated successfully');
     } catch (error) {
-        next(error); // Передача в централизованный обработчик
+        next(error);
     }
 };
 
-// --- НОВОЕ: Обработчик /api/generate-ideas ---
+// Обработчик /api/generate-ideas (из V11, т.к. промпт лучше)
 const generateIdeasHandler = async (req, res, next) => {
     try {
         const { generationModel } = req.body;
@@ -267,21 +289,20 @@ const generateIdeasHandler = async (req, res, next) => {
         res.json({ idea });
         logger.info('Idea generated successfully');
     } catch (error) {
-        next(error); // Передача в централизованный обработчик
+        next(error);
     }
 };
 
 // --- Маршруты ---
+// Используем middleware валидации из V11 для всех маршрутов
 app.post('/api/generate-prompt', validate(promptSchema), generatePromptHandler);
 app.post('/api/generate-tags', validate(tagsSchema), generateTagsHandler);
 app.post('/api/predict-problems', validate(problemsSchema), predictProblemsHandler);
 app.post('/api/generate-negative-prompt', validate(negativePromptSchema), generateNegativePromptHandler);
-
-// --- НОВОЕ: Регистрация вспомогательных маршрутов ---
 app.post('/api/translate', validate(translateSchema), translateHandler);
 app.post('/api/generate-ideas', validate(ideasSchema), generateIdeasHandler);
 
-// --- Централизованная обработка ошибок ---
+// --- Централизованная обработка ошибок (из V11) ---
 app.use((err, req, res, next) => {
   logger.error(`Unhandled Error: ${err.message}`, { stack: err.stack, ip: req.ip });
   res.status(500).json({ error: 'Internal Server Error' });
