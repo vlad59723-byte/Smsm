@@ -274,6 +274,18 @@
                             💡 Генератор идей для видео
                         </button>
                     </div>
+                    <div class="mt-4">
+                        <button id="generate-ideas-style-btn" class="w-full px-8 py-3 bg-yellow-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            💡 Генератор идей для стиля/освещения
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <button id="generate-ideas-quality-btn" class="w-full px-8 py-3 bg-yellow-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            💡 Генератор идей для качества/разрешения
+                        </button>
+                    </div>
                 </div>
                 <!-- Duration Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
@@ -298,6 +310,14 @@
                             <input type="range" id="duration-slider" min="4" max="60" value="10" class="w-full">
                             <p class="text-center text-lg font-bold mt-2"><span id="duration-value">10</span> секунд</p>
                         </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <h3 class="text-xl font-semibold text-gray-800">Качество/Разрешение:</h3>
+                    <div class="param-content">
+                        <select id="quality" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </select>
+                        <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="quality">🤖 Предложить качество</button>
                     </div>
                 </div>
                 <!-- End Duration Section -->
@@ -519,7 +539,7 @@
                     </div>
                 </div>
                 <!-- End Advanced Parameters Section -->
-    
+
                 <!-- Details Section -->
                 <div class="mt-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
                     <div class="flex justify-between items-center mb-2">
@@ -817,6 +837,8 @@
             const operatingModeSelect = document.getElementById('operating-mode');
             const translateToEnglishBtn = document.getElementById('translate-to-english-btn');
             const generateIdeasBtn = document.getElementById('generate-ideas-btn');
+            const generateIdeasStyleBtn = document.getElementById('generate-ideas-style-btn');
+            const generateIdeasQualityBtn = document.getElementById('generate-ideas-quality-btn');
             const historyTab = document.getElementById('history-tab');
             const favoritesTab = document.getElementById('favorites-tab');
             const historyList = document.getElementById('history-list');
@@ -1469,9 +1491,9 @@
 
                 // 2. Получаем значение "Режима Работы" из выпадающего списка
                 const operatingMode = operatingModeSelect.value;
-                
+
                 // === КОНЕЦ ИСПРАВЛЕНИЯ ===
-                
+
                 // --- НОВЫЙ КОД API ---
                 
                 // 1. Сбор всех параметров
@@ -2014,17 +2036,24 @@
                 }
             }
 
-            async function generateIdeas() {
+            async function generateIdeas(type = 'subject') {
                 try {
                     const response = await fetch('http://localhost:3000/api/generate-ideas', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value,
+                            type: type
                         })
                     });
                     const data = await response.json();
-                    subjectInput.value = data.idea;
+                    if (type === 'subject') {
+                        subjectInput.value = data.idea;
+                    } else if (type === 'style') {
+                        styleLightingInput.value = data.idea;
+                    } else if (type === 'quality') {
+                        qualityResolutionInput.value = data.idea;
+                    }
                     showNotification('Новая идея сгенерирована!', 'success');
                 } catch (error) {
                     showNotification('Ошибка генерации идей.', 'error');
@@ -2553,7 +2582,7 @@
                 'default': ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy']
             };
 
-            
+
             async function generateNegativePrompt() {
                 const positivePrompt = promptOutput.value;
                 if (!positivePrompt) {
@@ -2825,6 +2854,8 @@
             resetAnimeBtn.addEventListener('click', resetAnimeParameters);
             translateToEnglishBtn.addEventListener('click', translateToEnglish);
             generateIdeasBtn.addEventListener('click', generateIdeas);
+            generateIdeasStyleBtn.addEventListener('click', () => generateIdeas('style'));
+            generateIdeasQualityBtn.addEventListener('click', () => generateIdeas('quality'));
             addToFavoritesBtn.addEventListener('click', addToFavorites);
             historyTab.addEventListener('click', () => switchTab('history'));
             favoritesTab.addEventListener('click', () => switchTab('favorites'));
