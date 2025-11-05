@@ -16,7 +16,7 @@ test.describe('Dropdown Population', () => {
 
     // Check the total number of options
     const optionsCount = await styleDropdown.locator('option').count();
-    expect(optionsCount).toBe(32); // Assuming 32 styles from data.js
+    expect(optionsCount).toBe(33); // Assuming 33 styles from data.js
   });
 
   test('should populate the camera dropdown', async ({ page }) => {
