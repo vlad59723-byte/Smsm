@@ -274,6 +274,18 @@
                             💡 Генератор идей для видео
                         </button>
                     </div>
+                    <div class="mt-4">
+                        <button id="generate-ideas-style-btn" class="w-full px-8 py-3 bg-yellow-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            💡 Генератор идей для стиля/освещения
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <button id="generate-ideas-quality-btn" class="w-full px-8 py-3 bg-yellow-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            💡 Генератор идей для качества/разрешения
+                        </button>
+                    </div>
                 </div>
                 <!-- Duration Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg parameter-group">
@@ -300,13 +312,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <h3 class="text-xl font-semibold text-gray-800">Качество/Разрешение:</h3>
+                    <div class="param-content">
+                        <select id="quality" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </select>
+                        <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="quality">🤖 Предложить качество</button>
+                    </div>
+                </div>
                 <!-- End Duration Section -->
 
                 <!-- Parameters Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- Стиль Видео -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="style-section" class="p-6 bg-blue-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Стиль Видео:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -315,7 +335,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="style" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                               
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="style">🤖 Предложить стиль</button>
@@ -353,7 +373,7 @@
                     </div>
 
                     <!-- План/Движение Камеры -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="camera-section" class="p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">План/Движение Камеры:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -362,7 +382,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="camera" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="camera" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                                 
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="camera">🤖 Предложить движение камеры</button>
@@ -370,7 +390,7 @@
                     </div>
 
                     <!-- Освещение -->
-                    <div class="p-6 bg-white rounded-xl shadow-lg parameter-group">
+                    <div id="lighting-section" class="p-6 bg-yellow-50 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Освещение:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -379,7 +399,7 @@
                             </label>
                         </div>
                         <div class="param-content">
-                            <select id="lighting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <select id="lighting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" title="Volumetric light — добавляет глубину и видимые лучи света">
                                 
                             </select>
                             <button class="suggest-btn mt-2 w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200" data-target="lighting">🤖 Предложить освещение</button>
@@ -506,6 +526,14 @@
                                 <option value="slightly">Слегка туманно</option>
                                 <option value="moderately">Умеренно дымно</option>
                                 <option value="extremely">Очень густой туман</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="intensity-select" class="block text-sm font-medium text-gray-700">Интенсивность:</label>
+                            <select id="intensity-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="slightly">Slightly</option>
+                                <option value="moderately" selected>Moderately</option>
+                                <option value="extremely">Extremely</option>
                             </select>
                         </div>
                     </div>
@@ -809,6 +837,8 @@
             const operatingModeSelect = document.getElementById('operating-mode');
             const translateToEnglishBtn = document.getElementById('translate-to-english-btn');
             const generateIdeasBtn = document.getElementById('generate-ideas-btn');
+            const generateIdeasStyleBtn = document.getElementById('generate-ideas-style-btn');
+            const generateIdeasQualityBtn = document.getElementById('generate-ideas-quality-btn');
             const historyTab = document.getElementById('history-tab');
             const favoritesTab = document.getElementById('favorites-tab');
             const historyList = document.getElementById('history-list');
@@ -1306,6 +1336,33 @@
                 }
                 saveState();
             }
+
+            function applyIntensity(prompt) {
+                const intensitySelect = document.getElementById('intensity-select');
+                const intensity = intensitySelect.value;
+                if (intensity === 'slightly') {
+                    prompt = prompt.replace('fog', 'slightly foggy');
+                } else if (intensity === 'moderately') {
+                    prompt = prompt.replace('fog', 'moderately smoky');
+                } else if (intensity === 'extremely') {
+                    prompt = prompt.replace('fog', 'extremely dense fog');
+                }
+                return prompt;
+            }
+
+            function formatPromptOutput(prompt) {
+                // Check for flags and format accordingly
+                const flags = prompt.match(/--[a-z]+\s\d+:\d+/g);
+                if (flags) {
+                    let formattedPrompt = prompt;
+                    flags.forEach(flag => {
+                        formattedPrompt = formattedPrompt.replace(flag, `\n- ${flag}`);
+                    });
+                    return formattedPrompt;
+                }
+                // Default to bullet points for comma-separated values
+                return prompt.split(',').map(item => `- ${item.trim()}`).join('\n');
+            }
             
             function toggleModelSelection() {
                 const isEnabled = enableModelSelectionCheckbox.checked;
@@ -1358,10 +1415,12 @@
 // !!! ВОТ НОВАЯ ФУНКЦИЯ, КОТОРУЮ МЫ ДОБАВИЛИ !!!
             function collectAllParameters() {
                 const selectedModel = document.querySelector('input[name="model"]:checked').value;
+                const intensitySelect = document.getElementById('intensity-select');
                 
                 const parameters = {
                     sceneComplexity: sceneComplexitySlider.value,
                     fogIntensity: fogIntensitySelect.value,
+                    intensityLevels: intensitySelect.value,
                     style: getParameterValue('style', styleMap),
                     camera: getParameterValue('camera', cameraMap),
                     lighting: getParameterValue('lighting', lightingMap),
@@ -1398,28 +1457,43 @@
             // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
             // --- Единая функция генерации промпта (DRY) ---
             async function generatePrompt(isSuperImprove = false, mode = null) { // Добавляем 'async'
-                saveToHistory();
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею для видео.', 'warning');
                     return;
                 }
-                
+                saveToHistory();
                 const btn = isSuperImprove ? superImproveBtn : improveBtn;
                 const originalBtnText = btn.innerHTML;
                 const otherBtn = isSuperImprove ? improveBtn : superImproveBtn;
 
                 // --- UI: Показываем спиннер ---
                 btn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" ...>
+                       ... (код иконки) ...
                     </svg>
                     ${isSuperImprove ? 'Обработка Gemini...' : 'Обработка Gemini...'}
                 `;
                 btn.disabled = true;
                 otherBtn.disabled = true;
                 
+                // === НАЧАЛО ИСПРАВЛЕНИЯ ===
+
+                // 1. Определяем режим API на основе нажатой кнопки
+                let apiMode;
+                if (mode === 'auto-pilot') {
+                    apiMode = 'auto-pilot';
+                } else if (isSuperImprove) {
+                    apiMode = 'super-improve';
+                } else {
+                    apiMode = 'improve';
+                }
+
+                // 2. Получаем значение "Режима Работы" из выпадающего списка
+                const operatingMode = operatingModeSelect.value;
+
+                // === КОНЕЦ ИСПРАВЛЕНИЯ ===
+
                 // --- НОВЫЙ КОД API ---
                 
                 // 1. Сбор всех параметров
@@ -1436,7 +1510,8 @@
                         body: JSON.stringify({ 
                             idea: idea, 
                             parameters: parameters, // Отправляем собранные параметры
-                            mode: operatingModeSelect.value
+                            mode: apiMode, // <--- ИСПРАВЛЕНО
+                            operatingMode: operatingMode // <--- ДОБАВЛЕНО
                         })
                     });
 
@@ -1449,7 +1524,7 @@
                     const data = await response.json();
                     
                     // 5. Отображение результата от Gemini
-                    promptOutput.value = data.generatedPrompt;
+                    promptOutput.value = formatPromptOutput(data.generatedPrompt);
                     resultSection.style.display = 'block';
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
@@ -1816,7 +1891,7 @@
 
                 // Рандомизация идеи (простая симуляция)
                 const randomWords = ['Epic', 'Cinematic', 'Futuristic', 'Magical', 'Dystopian', 'Peaceful', 'Intense'];
-                ideaInput.value = `${randomWords[Math.floor(Math.random() * randomWords.length)]} scene of a ${getRandomKey(backgroundMap).split(' ')[0]} with a ${getRandomKey(cameraMap).split(' ')[0]} shot.`;
+                subjectInput.value = `${randomWords[Math.floor(Math.random() * randomWords.length)]} scene of a ${getRandomKey(backgroundMap).split(' ')[0]} with a ${getRandomKey(cameraMap).split(' ')[0]} shot.`;
                 
                 // Сброс текстовых полей деталей и негативного промпта
                 detailsTextarea.value = '';
@@ -1961,17 +2036,24 @@
                 }
             }
 
-            async function generateIdeas() {
+            async function generateIdeas(type = 'subject') {
                 try {
                     const response = await fetch('http://localhost:3000/api/generate-ideas', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value,
+                            type: type
                         })
                     });
                     const data = await response.json();
-                    subjectInput.value = data.idea;
+                    if (type === 'subject') {
+                        subjectInput.value = data.idea;
+                    } else if (type === 'style') {
+                        styleLightingInput.value = data.idea;
+                    } else if (type === 'quality') {
+                        qualityResolutionInput.value = data.idea;
+                    }
                     showNotification('Новая идея сгенерирована!', 'success');
                 } catch (error) {
                     showNotification('Ошибка генерации идей.', 'error');
@@ -1979,14 +2061,20 @@
             }
 
             function clearNegativePrompt() {
-                const commonNegativeTags = ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy', 'noise', 'ugly', 'disfigured', 'oversaturated', 'monochrome', 'cartoon', 'cropped', 'duplicate'];
                 let currentNegativeText = negativePromptTextarea.value;
-                commonNegativeTags.forEach(tag => {
-                    const tagRegex = new RegExp(`\\b${tag}\\b`, 'gi');
-                    currentNegativeText = currentNegativeText.replace(tagRegex, '');
-                });
-                negativePromptTextarea.value = currentNegativeText.replace(/, ,/g, ',').replace(/, /g, ' ').trim();
-                showNotification('Общие негативные теги удалены.', 'info');
+
+                if (currentNegativeText.length > 200) {
+                    const commonNegativeTags = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+                    let cleanedText = currentNegativeText.replace(commonNegativeTags, '');
+                    // Clean up trailing commas and whitespace
+                    cleanedText = cleanedText.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
+                    negativePromptTextarea.value = cleanedText;
+                    showNotification('Common negative tags (bad anatomy, low quality, artifacts) removed.', 'info');
+                } else {
+                    negativePromptTextarea.value = '';
+                    showNotification('Negative prompt cleared.', 'info');
+                }
+                saveState();
             }
 
             function updatePromptVisualization() {
@@ -1994,11 +2082,11 @@
                 let html = '';
 
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
-                html += `<span class="text-green-600">${idea}</span>`;
+                html += `<span class="text-blue-600">${idea}</span>`;
 
                 for (const [key, value] of Object.entries(parameters)) {
                     if (value) {
-                        html += `, <span class="text-blue-600">${key}: ${value}</span>`;
+                        html += `, <span class="text-green-600">${key}: ${value}</span>`;
                     }
                 }
 
@@ -2011,7 +2099,6 @@
 
                 promptVisualization.innerHTML = html;
             }
-
             // --- History and Favorites Logic ---
             function saveToHistory() {
                 const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -2103,7 +2190,7 @@
                     loadFavorites();
                     showNotification('Промпт добавлен в избранное.', 'success');
                 }
-            }
+             }
 
             function filterAndSortPresets() {
                 const filterValue = presetFilter.value.toLowerCase();
@@ -2158,6 +2245,7 @@
                 // Re-append to container
                 buttons.forEach(btn => presetButtonsContainer.appendChild(btn));
             }
+
             function switchTab(tab) {
                 if (tab === 'history') {
                     historyTab.classList.add('text-blue-600', 'border-blue-600');
@@ -2218,9 +2306,9 @@
                     }
 
                     if (matchCount >= 2) {
-                        btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500', 'transition-all', 'duration-200');
+                        btn.classList.add('bg-yellow-200');
                     } else {
-                        btn.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500');
+                        btn.classList.remove('bg-yellow-200');
                     }
                 });
             }
@@ -2429,7 +2517,7 @@
             
             async function handleSuggestClick(event) {
                 const targetId = event.currentTarget.dataset.target;
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
 
                 if (!idea) {
                     showNotification('Пожалуйста, введите вашу идею, чтобы получить предложение.', 'warning');
@@ -2494,6 +2582,7 @@
                 'default': ['low quality', 'blurry', 'artifacts', 'watermark', 'text', 'bad anatomy']
             };
 
+
             async function generateNegativePrompt() {
                 const positivePrompt = promptOutput.value;
                 if (!positivePrompt) {
@@ -2506,8 +2595,9 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            positivePrompt: positivePrompt,
-                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                            prompt: positivePrompt,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value,
+                            clean: true
                         })
                     });
                     const data = await response.json();
@@ -2515,11 +2605,12 @@
                     if (currentNegativeText.length > 0 && !currentNegativeText.endsWith(',')) {
                         currentNegativeText += ', ';
                     }
-                    negativePromptTextarea.value = currentNegativeText + data.negativeTags;
+                    negativePromptTextarea.value = currentNegativeText + data.generatedNegative;
                     showNotification('Негативные теги сгенерированы.', 'success');
                 } catch (error) {
                     showNotification('Ошибка генерации негативных тегов.', 'error');
                 }
+                saveState();
             }
 
             generateNegativeBtn.addEventListener('click', generateNegativePrompt);
@@ -2563,7 +2654,7 @@
             const suggestTagsBtn = document.getElementById('suggest-tags-btn');
 
             async function handleSuggestTags() {
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 const prompt = promptOutput.value.trim();
 
                 if (!idea) {
@@ -2702,7 +2793,7 @@
             });
 
             async function handlePredictProblems() {
-                const idea = ideaInput.value.trim();
+                const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
                 const prompt = promptOutput.value.trim();
 
                 if (!idea) {
@@ -2759,9 +2850,12 @@
 
             predictProblemsBtn.addEventListener('click', handlePredictProblems);
             createPresetBtn.addEventListener('click', saveCustomPreset);
+            clearNegativeBtn.addEventListener('click', clearNegativePrompt);
             resetAnimeBtn.addEventListener('click', resetAnimeParameters);
             translateToEnglishBtn.addEventListener('click', translateToEnglish);
             generateIdeasBtn.addEventListener('click', generateIdeas);
+            generateIdeasStyleBtn.addEventListener('click', () => generateIdeas('style'));
+            generateIdeasQualityBtn.addEventListener('click', () => generateIdeas('quality'));
             addToFavoritesBtn.addEventListener('click', addToFavorites);
             historyTab.addEventListener('click', () => switchTab('history'));
             favoritesTab.addEventListener('click', () => switchTab('favorites'));

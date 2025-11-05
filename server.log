@@ -1,0 +1,2 @@
+[dotenv@17.2.3] injecting env (1) from s/.env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+info: Production-ready server listening at http://localhost:3000 {"timestamp":"2025-11-05T13:38:07.399Z"}

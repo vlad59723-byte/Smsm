@@ -33,6 +33,25 @@ const dropdownData = {
         "claymation": "Пластилиновая анимация",
         "rotoscoping": "Ротоскопирование"
     },
+    intensity: {
+        "slightly": "Slightly",
+        "moderately": "Moderately",
+        "extremely": "Extremely"
+    },
+    quality: {
+        "8k": "8K",
+        "4k": "4K",
+        "hyperrealism": "Гиперреализм",
+        "photorealistic": "Фотореализм",
+        "unreal-engine-5": "Unreal Engine 5",
+        "octane-render": "Octane Render",
+        "v-ray": "V-Ray",
+        "ray-tracing": "Ray Tracing",
+        "60fps": "60fps",
+        "120fps": "120fps",
+        "hdr": "HDR",
+        "subsurface-scattering": "Subsurface Scattering"
+    },
     camera: {
         "medium-shot": "Средний план (Medium Shot)",
         "wide-shot": "Широкий план (Wide Shot)",

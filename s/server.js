@@ -1,173 +1,356 @@
-
+// server.js (Финальная профессиональная версия, V11 + Интеграция Режимов Работы)
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const winston = require('winston');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Joi = require('joi');
-require('dotenv').config({ path: __dirname + '/.env' });
+require('dotenv').config({ path: __dirname + '/.env' }); // Убедитесь, что .env в той же папке
+
+// ВАЖНО: Buffer используется для 'base64', но это встроенный модуль Node.js, импорт не нужен.
+
+const genAIModule = require('@google/generative-ai');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Winston logger setup
+// --- Логирование ---
 const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    defaultMeta: { service: 'user-service' },
-    transports: [
-        new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'combined.log' }),
-    ],
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({ format: winston.format.simple() }),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
 });
 
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.simple(),
-    }));
+// --- Инициализация Gemini ---
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  logger.error('GEMINI_API_KEY not found in .env file.');
+  process.exit(1);
 }
+const genAI = new genAIModule.GoogleGenerativeAI(apiKey);
 
-// Security and Performance Middleware
-app.use(cors());
+// --- Rate Limiter ---
+const rateLimiter = new RateLimiterMemory({
+  points: 10, // 10 запросов
+  duration: 60 // в минуту (в V11 было 60 сек, во втором файле 1 сек. 60 безопаснее)
+});
+const rateLimiterMiddleware = (req, res, next) => {
+  rateLimiter.consume(req.ip)
+    .then(() => next())
+    .catch(() => {
+        logger.warn(`Too Many Requests from ${req.ip}`);
+        res.status(429).send('Too Many Requests');
+    });
+};
+
+// --- Middleware ---
 app.use(helmet());
-app.use(compression());
+app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(compression());
+app.use(rateLimiterMiddleware);
+app.use(express.static(__dirname)); // Раздача ai_prompt_creator_v11_enhanced.html
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
+    res.sendFile(__dirname + '/ai_prompt_creator_v11_enhanced.html');
 });
 
 app.get('/data.js', (req, res) => {
-    res.sendFile(__dirname + '/data.js');
+    res.sendFile(__dirname + '/data.js');
 });
 
 
-// Rate Limiting
-const rateLimiter = new RateLimiterMemory({
-    points: 10, // 10 requests
-    duration: 1, // per 1 second by IP
+// --- Схемы валидации Joi ---
+
+// Схема для /generate-prompt (из V11)
+const promptSchema = Joi.object({
+  idea: Joi.string().min(3).required(),
+  parameters: Joi.object({
+    sceneComplexity: Joi.number().min(1).max(10),
+    intensityLevels: Joi.string().valid('slightly', 'moderately', 'extremely'),
+    generationModel: Joi.string().optional()
+  }).unknown(true),
+  mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required(),
+  operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional()
 });
 
-const rateLimiterMiddleware = (req, res, next) => {
-    rateLimiter.consume(req.ip)
-        .then(() => {
-            next();
-        })
-        .catch(() => {
-            res.status(429).send('Too Many Requests');
-        });
+// Схема для /generate-tags (из V11)
+const tagsSchema = Joi.object({
+  idea: Joi.string().min(3).required(),
+  prompt: Joi.string().min(10).required(),
+  generationModel: Joi.string().optional()
+});
+
+// Схема для /predict-problems (из V11)
+const problemsSchema = Joi.object({
+  idea: Joi.string().min(3).required(),
+  prompt: Joi.string().min(10).required(),
+  generationModel: Joi.string().optional()
+});
+
+// Схема для /generate-negative-prompt (из V11)
+const negativePromptSchema = Joi.object({
+  prompt: Joi.string().min(10).required(),
+  generationModel: Joi.string().optional(),
+  clean: Joi.boolean().optional()
+});
+
+// Схема для /translate (из V11)
+const translateSchema = Joi.object({
+  text: Joi.string().min(1).required(),
+  generationModel: Joi.string().optional()
+});
+
+// Схема для /generate-ideas (из V11)
+const ideasSchema = Joi.object({
+  generationModel: Joi.string().optional(),
+  type: Joi.string().valid('subject', 'style', 'quality').default('subject')
+});
+
+// Middleware для валидации (из V11)
+const validate = (schema) => (req, res, next) => {
+  const { error } = schema.validate(req.body);
+  if (error) {
+    logger.warn(`Validation error: ${error.details[0].message}`);
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  next();
 };
 
-app.use(rateLimiterMiddleware);
-
-// Google Generative AI setup
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// API Endpoints
-
-const generatePromptSchema = Joi.object({
-    idea: Joi.string().required(),
-    parameters: Joi.object().required(),
-    mode: Joi.string().valid('general', 'no-names', 'base64').required(),
-});
-
-app.post('/api/generate-prompt', async (req, res) => {
-    const { error } = generatePromptSchema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+function addComplexityDetails(prompt, sceneComplexity) {
+    if (sceneComplexity > 7) {
+        prompt += ", ultra-detailed, 8k, trending on artstation";
+    } else if (sceneComplexity > 5) {
+        prompt += ", highly detailed, photorealistic";
     }
+    return prompt;
+}
 
-    const { idea, parameters, mode } = req.body;
-    const { generationModel } = parameters;
-    const model = genAI.getGenerativeModel({ model: generationModel });
+function applyIntensity(prompt, intensity) {
+    if (intensity === 'slightly') {
+        prompt = prompt.replace('fog', 'slightly foggy');
+    } else if (intensity === 'moderately') {
+        prompt = prompt.replace('fog', 'moderately smoky');
+    } else if (intensity === 'extremely') {
+        prompt = prompt.replace('fog', 'extremely dense fog');
+    }
+    return prompt;
+}
 
-    let prompt = `Generate a detailed prompt for a video generation AI. The user's idea is: "${idea}".`;
+const generatePromptHandler = async (req, res, next) => {
+  try {
+    const { idea, parameters, mode, operatingMode } = req.body;
+    const modelName = parameters.generationModel || 'gemini-2.5-flash';
+    const model = genAI.getGenerativeModel({ model: modelName });
+    logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}, OperatingMode: ${operatingMode}`);
 
-    if (parameters) {
-        prompt += " The following parameters are provided:\n";
-        for (const [key, value] of Object.entries(parameters)) {
-            if (value) {
-                prompt += `- ${key}: ${value}\n`;
-            }
+    // --- Логика V11 (Режим 'auto-pilot' / 'improve') ---
+    let systemInstruction;
+    if (mode === 'auto-pilot') {
+      systemInstruction = `
+        Вы — элитный режиссер...
+        ИДЕЯ ПОЛЬЗОВАТЕЛЯ: "${idea}"
+        ВАША ЗАДАЧА: ...САМОСТОЯТЕЛЬНО выберите...
+        5. Отвечайте только финальным промптом.
+      `;
+    } else {
+      systemInstruction = `
+        Вы — эксперт по созданию профессиональных...
+        ИСХОДНЫЕ ДАННЫЕ:
+        Базовая идея: "${idea}"
+        Режим: ${mode === 'super-improve' ? 'Максимально детализировать' : 'Улучшить'}
+        Параметры: ${JSON.stringify(parameters, null, 2)}
+        
+        ПРАВИЛА ГЕНЕРАЦИИ:
+        1. Объедините все параметры в одно, связное, художественное описание.
+        ...
+        6. Отвечайте только финальным промптом.
+      `;
+    }
+
+    const result = await model.generateContent(systemInstruction);
+    let generatedPrompt = result.response.text().trim(); // Используем let для возможности изменения
+
+    generatedPrompt = addComplexityDetails(generatedPrompt, parameters.sceneComplexity);
+    generatedPrompt = applyIntensity(generatedPrompt, parameters.intensityLevels);
+
+    // --- ДОБАВЛЕНО: Логика "Режима Работы" из второго файла ---
+    if (operatingMode === 'no-names') {
+        logger.info('Applying no-names filter...');
+        const noNamesPrompt = `Rewrite the following prompt to avoid using any specific names of people, brands, or characters. Instead, use descriptive language. For example, instead of "Harry Potter", you could say "a young wizard with a lightning scar". Respond only with the rewritten prompt.\n\nOriginal prompt: "${generatedPrompt}"`;
+       
+        // Используем ту же модель
+        const noNamesResult = await model.generateContent(noNamesPrompt);
+        generatedPrompt = noNamesResult.response.text().trim();
+
+    } else if (operatingMode === 'base64') {
+        logger.info('Applying base64 filter...');
+        // Логика из второго файла для кодирования
+        generatedPrompt = generatedPrompt.replace(/\b[A-Z][a-z]{2,}\b/g, (match) => {
+            // Ищем слова с большой буквы (длиннее 2 символов) как потенциальные имена
+            return Buffer.from(match).toString('base64');
+        });
+    }
+    // --- Конец добавленной логики ---
+
+    res.json({ generatedPrompt });
+    logger.info('Prompt generated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Обработчик /api/generate-tags (из V11)
+const generateTagsHandler = async (req, res, next) => {
+  try {
+    const { idea, prompt, generationModel } = req.body;
+    const modelName = generationModel || 'gemini-2.5-flash';
+    const model = genAI.getGenerativeModel({ model: modelName });
+    logger.info(`Using model (Tags): ${modelName}`);
+
+    const generationPrompt = `
+        Вы — ассистент по промпт-инжинирингу.
+        Идея: "${idea}"
+        Уже сгенерированный промпт: "${prompt}"
+
+        ЗАДАЧА: Предложите 5-7 дополнительных, релевантных тегов (через запятую), которые УЖЕ НЕ ВСТРЕЧАЮТСЯ в промпте, но могут его улучшить (например: "8K, ray tracing, subsurface scattering, masterpiece").
+        ОТВЕТ: Только список тегов через запятую.
+    `;
+
+    const result = await model.generateContent(generationPrompt);
+    const generatedTags = result.response.text().trim();
+    res.json({ generatedTags });
+    logger.info('Tags generated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Обработчик /api/predict-problems (из V11)
+const predictProblemsHandler = async (req, res, next) => {
+  try {
+    const { idea, prompt, generationModel } = req.body;
+    const modelName = generationModel || 'gemini-2.5-flash';
+    const model = genAI.getGenerativeModel({ model: modelName });
+    logger.info(`Using model (Problems): ${modelName}`);
+
+    const generationPrompt = `
+        Вы — QA-тестировщик для ИИ-генераторов видео.
+        Промпт для анализа: "${prompt}"
+
+        ЗАДАЧА: Какие 3-5 главных визуальных проблем (артефактов) могут возникнуть при генерации этого промпта?
+        ОТВЕТ: Напишите список ключевых слов для НЕГАТИВНОГО промпта, чтобы избежать этих проблем (например: "low quality, blurry, bad anatomy, text, watermark, artifacts").
+        Отвечайте только списком тегов через запятую.
+    `;
+    
+    const result = await model.generateContent(generationPrompt);
+    const predictedProblems = result.response.text().trim();
+    res.json({ predictedProblems });
+    logger.info('Problems predicted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Обработчик /api/generate-negative-prompt (из V11, т.к. промпт лучше)
+const generateNegativePromptHandler = async (req, res, next) => {
+    try {
+        const { prompt, generationModel, clean } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        logger.info(`Using model (Negative Prompt): ${modelName}`);
+
+        const generationPrompt = `
+        Вы — эксперт по негативным промптам для ИИ-генераторов видео.
+        ПОЗИТИВНЫЙ ПРОМПТ: "${prompt}"
+
+        ЗАДАЧА: Сгенерируйте краткий список (5-10) ключевых слов для НЕГАТИВНОГО промпта, чтобы избежать распространенных ошибок генерации (артефактов, размытия, плохого качества, деформаций), которые могут возникнуть с этим стилем.
+        ОТВЕТ: Только список тегов через запятую.
+    `;
+
+        const result = await model.generateContent(generationPrompt);
+        let generatedNegative = result.response.text().trim();
+
+        if (clean) {
+            const commonErrors = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+            generatedNegative = generatedNegative.replace(commonErrors, '');
+            generatedNegative = generatedNegative.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
         }
+
+        res.json({ generatedNegative });
+        logger.info('Negative prompt generated successfully');
+    } catch (error) {
+        next(error);
     }
+};
 
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let generatedPrompt = response.text();
+// Обработчик /api/translate (из V11, т.к. промпт лучше)
+const translateHandler = async (req, res, next) => {
+    try {
+        const { text, generationModel } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const prompt = `Translate the following text to English. Respond only with the translated text: "${text}"`;
 
-        // Apply operating mode
-        if (mode === 'no-names') {
-            const noNamesPrompt = `Rewrite the following prompt to avoid using any specific names of people, brands, or characters. Instead, use descriptive language. For example, instead of "Harry Potter", you could say "a young wizard with a lightning scar".\n\nOriginal prompt: "${generatedPrompt}"`;
-            const noNamesResult = await model.generateContent(noNamesPrompt);
-            const noNamesResponse = await noNamesResult.response;
-            generatedPrompt = noNamesResponse.text();
-        } else if (mode === 'base64') {
-            // Find all capitalized words (potential names) and encode them
-            generatedPrompt = generatedPrompt.replace(/\b[A-Z][a-z]*\b/g, (match) => {
-                return Buffer.from(match).toString('base64');
-            });
+        const result = await model.generateContent(prompt);
+        const translatedText = result.response.text().trim();
+        res.json({ translatedText });
+        logger.info('Text translated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Обработчик /api/generate-ideas (из V11, т.к. промпт лучше)
+const generateIdeasHandler = async (req, res, next) => {
+    try {
+        const { generationModel, type } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        let prompt;
+        switch (type) {
+            case 'style':
+                prompt = `Generate a single, creative, and interesting idea for a video's style and lighting. Respond only with the idea text.`;
+                break;
+            case 'quality':
+                prompt = `Generate a single, creative, and interesting idea for a video's quality and resolution. Respond only with the idea text.`;
+                break;
+            default:
+                prompt = `Generate a single, creative, and interesting idea for a video. Respond only with the idea text.`;
         }
+        const result = await model.generateContent(prompt);
+        const idea = result.response.text().trim();
+        res.json({ idea });
+        logger.info('Idea generated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
 
-        res.json({ generatedPrompt });
-    } catch (error) {
-        logger.error(error);
-        res.status(500).json({ error: 'Failed to generate prompt' });
-    }
+// --- Маршруты ---
+// Используем middleware валидации из V11 для всех маршрутов
+app.post('/api/generate-prompt', validate(promptSchema), generatePromptHandler);
+app.post('/api/generate-tags', validate(tagsSchema), generateTagsHandler);
+app.post('/api/predict-problems', validate(problemsSchema), predictProblemsHandler);
+app.post('/api/generate-negative-prompt', validate(negativePromptSchema), generateNegativePromptHandler);
+app.post('/api/translate', validate(translateSchema), translateHandler);
+app.post('/api/generate-ideas', validate(ideasSchema), generateIdeasHandler);
+
+// --- Централизованная обработка ошибок (из V11) ---
+app.use((err, req, res, next) => {
+  logger.error(`Unhandled Error: ${err.message}`, { stack: err.stack, ip: req.ip });
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
-app.post('/api/translate', async (req, res) => {
-    const { text, generationModel } = req.body;
-    const model = genAI.getGenerativeModel({ model: generationModel });
-    const prompt = `Translate the following text to English: "${text}"`;
-
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const translatedText = response.text();
-        res.json({ translatedText });
-    } catch (error) {
-        logger.error(error);
-        res.status(500).json({ error: 'Failed to translate text' });
-    }
-});
-
-app.post('/api/generate-ideas', async (req, res) => {
-    const { generationModel } = req.body;
-    const model = genAI.getGenerativeModel({ model: generationModel });
-    const prompt = `Generate a creative and interesting idea for a video.`;
-
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const idea = response.text();
-        res.json({ idea });
-    } catch (error) {
-        logger.error(error);
-        res.status(500).json({ error: 'Failed to generate ideas' });
-    }
-});
-
-app.post('/api/generate-negative-prompt', async (req, res) => {
-    const { positivePrompt, generationModel } = req.body;
-    const model = genAI.getGenerativeModel({ model: generationModel });
-    const prompt = `Based on the following positive prompt, generate a list of relevant negative tags to improve the quality of the generated video. Positive prompt: "${positivePrompt}"`;
-
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const negativeTags = response.text();
-        res.json({ negativeTags });
-    } catch (error) {
-        logger.error(error);
-        res.status(500).json({ error: 'Failed to generate negative prompt' });
-    }
-});
-
+// --- Запуск сервера ---
 app.listen(port, () => {
-    logger.info(`Server is running on http://localhost:${port}`);
+  logger.info(`Production-ready server listening at http://localhost:${port}`);
 });
