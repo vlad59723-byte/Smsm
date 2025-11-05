@@ -111,7 +111,8 @@ const translateSchema = Joi.object({
 
 // Схема для /generate-ideas (из V11)
 const ideasSchema = Joi.object({
-  generationModel: Joi.string().optional()
+  generationModel: Joi.string().optional(),
+  type: Joi.string().valid('subject', 'style', 'quality').default('subject')
 });
 
 // Middleware для валидации (из V11)
@@ -146,7 +147,7 @@ function applyIntensity(prompt, intensity) {
 
 const generatePromptHandler = async (req, res, next) => {
   try {
-    const { idea, parameters, mode, operatingMode } = req.body; 
+    const { idea, parameters, mode, operatingMode } = req.body;
     const modelName = parameters.generationModel || 'gemini-2.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
     logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}, OperatingMode: ${operatingMode}`);
@@ -185,7 +186,7 @@ const generatePromptHandler = async (req, res, next) => {
     if (operatingMode === 'no-names') {
         logger.info('Applying no-names filter...');
         const noNamesPrompt = `Rewrite the following prompt to avoid using any specific names of people, brands, or characters. Instead, use descriptive language. For example, instead of "Harry Potter", you could say "a young wizard with a lightning scar". Respond only with the rewritten prompt.\n\nOriginal prompt: "${generatedPrompt}"`;
-        
+       
         // Используем ту же модель
         const noNamesResult = await model.generateContent(noNamesPrompt);
         generatedPrompt = noNamesResult.response.text().trim();
@@ -311,11 +312,20 @@ const translateHandler = async (req, res, next) => {
 // Обработчик /api/generate-ideas (из V11, т.к. промпт лучше)
 const generateIdeasHandler = async (req, res, next) => {
     try {
-        const { generationModel } = req.body;
+        const { generationModel, type } = req.body;
         const modelName = generationModel || 'gemini-2.5-flash';
         const model = genAI.getGenerativeModel({ model: modelName });
-        const prompt = `Generate a single, creative, and interesting idea for a video. Respond only with the idea text.`;
-
+        let prompt;
+        switch (type) {
+            case 'style':
+                prompt = `Generate a single, creative, and interesting idea for a video's style and lighting. Respond only with the idea text.`;
+                break;
+            case 'quality':
+                prompt = `Generate a single, creative, and interesting idea for a video's quality and resolution. Respond only with the idea text.`;
+                break;
+            default:
+                prompt = `Generate a single, creative, and interesting idea for a video. Respond only with the idea text.`;
+        }
         const result = await model.generateContent(prompt);
         const idea = result.response.text().trim();
         res.json({ idea });
