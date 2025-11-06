@@ -115,10 +115,6 @@ const ideasSchema = Joi.object({
   type: Joi.string().valid('subject', 'style', 'quality').default('subject')
 });
 
-const customPresetSchema = Joi.object({
-    idea: Joi.string().min(3).required(),
-});
-
 // Middleware для валидации (из V11)
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
@@ -139,14 +135,12 @@ function addComplexityDetails(prompt, sceneComplexity) {
 }
 
 function applyIntensity(prompt, intensity) {
-    if (intensity === 'slightly') {
-        prompt = prompt.replace('fog', 'slightly foggy');
-    } else if (intensity === 'moderately') {
-        prompt = prompt.replace('fog', 'moderately smoky');
-    } else if (intensity === 'extremely') {
-        prompt = prompt.replace('fog', 'extremely dense fog');
-    }
-    return prompt;
+    const intensityMap = {
+        'slightly': 'slightly foggy',
+        'moderately': 'moderately smoky',
+        'extremely': 'extremely dense fog'
+    };
+    return prompt.replace(/\bfog\b/gi, intensityMap[intensity] || 'fog');
 }
 
 const generatePromptHandler = async (req, res, next) => {
@@ -198,9 +192,9 @@ const generatePromptHandler = async (req, res, next) => {
     } else if (operatingMode === 'base64') {
         logger.info('Applying base64 filter...');
         // Логика из второго файла для кодирования
+        const properNouns = ['Harry', 'Potter', 'Disney', 'Marvel', 'Netflix']; // расширьте список
         generatedPrompt = generatedPrompt.replace(/\b[A-Z][a-z]{2,}\b/g, (match) => {
-            // Ищем слова с большой буквы (длиннее 2 символов) как потенциальные имена
-            return Buffer.from(match).toString('base64');
+            return properNouns.includes(match) ? Buffer.from(match).toString('base64') : match;
         });
     }
     // --- Конец добавленной логики ---
@@ -339,38 +333,6 @@ const generateIdeasHandler = async (req, res, next) => {
     }
 };
 
-const generateCustomPresetHandler = async (req, res, next) => {
-    try {
-        const { idea } = req.body;
-        const modelName = 'gemini-2.5-flash';
-        const model = genAI.getGenerativeModel({ model: modelName });
-
-        const generationPrompt = `
-            Based on the user's idea "${idea}", generate a JSON object for a preset with the following fields: "style", "camera", "lighting", "cinematography", "mood", "effect", "background", "audio", "details", and "negative".
-            The values for each field should be chosen from the following maps:
-            - style: realistic, animation-3d, anime, abstract, documentary, stop-motion, surreal, fantasy, futuristic, oil-painting, watercolor, low-poly, voxel, pixel-art, comic-book, noir, steampunk, cyberpunk, minimalist, hyperrealism, cinematic, vintage, glitch-art, grunge, sketch, pop-art, impressionism, expressionism, photogrammetry, tilt-shift, claymation, rotoscoping
-            - camera: medium-shot, wide-shot, close-up, extreme-close-up, long-shot, establishing-shot, dutch-angle, low-angle, high-angle, overhead-shot, tracking, dolly-zoom, pan-left, pan-right, tilt-up, tilt-down, crane-shot, handheld, steadicam, point-of-view, reverse-shot, arc-shot, zoom-in, zoom-out, slow-motion, time-lapse, bullet-time, macro-shot, micro-shot, gimbal-shot, whip-pan, rack-focus
-            - lighting: natural, cinematic, neon, backlight, soft, hard, low-key, high-key, volumetric, rim-light, studio-light, candlelight, fluorescent, strobe, magic-glow, sunset, moonlight, underwater, firelight, street-lamp, spotlight, fill-light, practical-light, ambient-occlusion, ray-tracing, chromatic-aberration, flare, two-tone, dramatic, silhouetted, foggy, rainy
-            - cinematography: 16:9, 21:9, 4:3, 1:1, 9:16, 2.35:1, 1.85:1, 2.76:1, anamorphic, spherical, fisheye, macro, telephoto, wide-angle, prime-lens, zoom-lens, vintage-lens, low-depth, deep-depth, bokeh, film-grain, digital-clean, vhs-tape, super-8, 16mm, 35mm, imax, technicolor, sepia, monochrome, hdr, sdr
-            - mood: epic, joyful, tense, calm, nostalgic, magical, dystopian, whimsical, melancholic, ominous, ethereal, surreal, romantic, horror, action, peaceful, mysterious, dramatic, gloomy, hopeful, isolated, energetic, dreamlike, chaotic, suspenseful, spiritual, futuristic, historical, meditative, silly, intense, warm
-            - effect: none, film-grain, glitch, depth-of-field, smoke-fog, vhs, god-rays, chromatic-aberration, lens-flare, particles, time-lapse, slow-motion, bullet-time, stop-motion, tilt-shift, motion-blur, double-exposure, anamorphic-flare, rain, snow, fire, water-splash, electric-sparks, hologram, neon-lines, scanlines, pixelation, distortion, vignette, color-grading, noise, bloom
-            - background: urban-city, nature-forest, cyberpunk-street, abstract-geometric, beach-ocean, mountain-range, desert, space, historical-castle, ancient-ruins, laboratory, medieval-village, post-apocalyptic-wasteland, floating-island, volcano, train-station, abandoned-factory, rooftop-city, japanese-garden, wild-west, deep-sea-trench, alien-planet, library, hospital-corridor, concert-stage, classroom, art-gallery, suburban-street, futuristic-city, underground-bunker, swamp, canyon, ice-cave, space-station, pirate-ship, fairytale-forest, olympic-stadium, deserted-highway, rainy-alley
-            - audio: none, epic-music, synthwave-music, lo-fi-music, nature-sounds, voiceover, sound-effects, ambient, rock, jazz, classical, hip-hop, electronic-trance, horror-score, cinematic-boom, footsteps, rain-on-window, wind-howling, crowd-chatter, silence, 8bit-music, vocal-trance, orchestral-strings, acoustic-guitar, heavy-metal, symphony, synth-pop, techno, whispers, explosions, car-engine, birds-chirping, ocean-waves, dubstep, folk, gospel, reggae, opera, medieval-lute, sci-fi-bleeps, western-whistle, trap-beat, k-pop, japanese-flute, sitar
-            - details: A string of relevant keywords.
-            - negative: A string of relevant keywords to exclude.
-            Respond with only the JSON object.
-        `;
-
-        const result = await model.generateContent(generationPrompt);
-        const presetText = result.response.text().trim();
-        const preset = JSON.parse(presetText);
-        res.json({ preset });
-        logger.info('Custom preset generated successfully');
-    } catch (error) {
-        next(error);
-    }
-};
-
 // --- Маршруты ---
 // Используем middleware валидации из V11 для всех маршрутов
 app.post('/api/generate-prompt', validate(promptSchema), generatePromptHandler);
@@ -379,7 +341,6 @@ app.post('/api/predict-problems', validate(problemsSchema), predictProblemsHandl
 app.post('/api/generate-negative-prompt', validate(negativePromptSchema), generateNegativePromptHandler);
 app.post('/api/translate', validate(translateSchema), translateHandler);
 app.post('/api/generate-ideas', validate(ideasSchema), generateIdeasHandler);
-app.post('/api/generate-custom-preset', validate(customPresetSchema), generateCustomPresetHandler);
 
 // --- Централизованная обработка ошибок (из V11) ---
 app.use((err, req, res, next) => {
