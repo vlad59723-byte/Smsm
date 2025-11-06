@@ -202,10 +202,6 @@
                     <p class="text-sm text-gray-500 mt-3">Нажмите, чтобы автоматически заполнить все параметры.</p>
                     <div class="mt-4" id="custom-presets-container"></div>
                     <button id="create-preset-btn" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition-colors duration-200 text-sm font-medium">Создать свой пресет</button>
-                    <div class="mt-4">
-                        <input type="text" id="custom-preset-idea" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Идея для генерации пресета...">
-                        <button id="generate-custom-preset-btn" class="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 transition-colors duration-200 text-sm font-medium">Сгенерировать пресет</button>
-                    </div>
                 </div>
                 <!-- End Presets Section -->
                 <!-- Detail Level Section -->
@@ -858,7 +854,6 @@
             const promptVisualization = document.getElementById('prompt-visualization');
             const presetFilter = document.getElementById('preset-filter');
             const presetSort = document.getElementById('preset-sort');
-            const generateCustomPresetBtn = document.getElementById('generate-custom-preset-btn');
 
             // --- Расширенные карты параметров ---
             const styleMap = {
@@ -2864,33 +2859,6 @@
             addToFavoritesBtn.addEventListener('click', addToFavorites);
             historyTab.addEventListener('click', () => switchTab('history'));
             favoritesTab.addEventListener('click', () => switchTab('favorites'));
-
-            generateCustomPresetBtn.addEventListener('click', async () => {
-                const idea = document.getElementById('custom-preset-idea').value;
-                if (!idea) {
-                    showNotification('Please enter an idea for the custom preset.', 'warning');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('http://localhost:3000/api/generate-custom-preset', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ idea })
-                    });
-                    const data = await response.json();
-                    const presetName = prompt("Enter a name for your new preset:", idea);
-                    if (presetName) {
-                        const customPresets = JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY)) || [];
-                        customPresets.push({ name: presetName, state: data.preset });
-                        localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(customPresets));
-                        loadCustomPresets();
-                        showNotification(`Preset "${presetName}" created and saved!`, 'success');
-                    }
-                } catch (error) {
-                    showNotification('Error generating custom preset.', 'error');
-                }
-            });
 
             historyList.addEventListener('click', e => {
                 if (e.target.classList.contains('reuse-btn')) {
