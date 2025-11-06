@@ -1,18 +1,20 @@
 {
-  "name": "gemini-prompt-proxy",
-  "version": "1.0.0",
-  "description": "Proxy server for Gemini API calls.",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
-    "@google/generative-ai": "^0.3.0",
+    "@google/generative-ai": "^0.1.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.18.2",
-    "joi": "^18.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",  
+    "helmet": "^8.1.0",
+    "joi": "^17.9.2",
     "rate-limiter-flexible": "^8.1.0",
     "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   }
 }
