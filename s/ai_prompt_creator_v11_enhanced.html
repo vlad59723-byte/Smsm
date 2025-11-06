@@ -2853,7 +2853,7 @@
             clearNegativeBtn.addEventListener('click', clearNegativePrompt);
             resetAnimeBtn.addEventListener('click', resetAnimeParameters);
             translateToEnglishBtn.addEventListener('click', translateToEnglish);
-            generateIdeasBtn.addEventListener('click', generateIdeas);
+            generateIdeasBtn.addEventListener('click', () => generateIdeas('subject'));
             generateIdeasStyleBtn.addEventListener('click', () => generateIdeas('style'));
             generateIdeasQualityBtn.addEventListener('click', () => generateIdeas('quality'));
             addToFavoritesBtn.addEventListener('click', addToFavorites);
