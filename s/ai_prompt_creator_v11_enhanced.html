@@ -21,7 +21,6 @@
     </script>
     <script src="data.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
     <style>
         :root {
             --primary-color: #3B82F6; 
@@ -103,6 +102,36 @@
             background-color: white;
             border-radius: 50%;
             transition: transform 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        .notification-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .notification-fade-out {
+            animation: fadeOut 0.3s ease-in forwards;
         }
     </style>
 </head>
@@ -382,7 +411,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <!-- Стиль Видео -->
-                    <div id="style-section" class="p-6 bg-blue-50 rounded-xl shadow-lg parameter-group">
+                    <div id="style-section" class="p-6 bg-blue-100 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Стиль Видео:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -429,7 +458,7 @@
                     </div>
 
                     <!-- План/Движение Камеры -->
-                    <div id="camera-section" class="p-6 bg-red-50 rounded-xl shadow-lg parameter-group">
+                    <div id="camera-section" class="p-6 bg-red-100 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">План/Движение Камеры:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -446,7 +475,7 @@
                     </div>
 
                     <!-- Освещение -->
-                    <div id="lighting-section" class="p-6 bg-yellow-50 rounded-xl shadow-lg parameter-group">
+                    <div id="lighting-section" class="p-6 bg-yellow-100 rounded-xl shadow-lg parameter-group">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-800">Освещение:</h3>
                             <label class="flex items-center cursor-pointer">
@@ -739,7 +768,7 @@
                         </div>
                     </div>
                     <div id="prompt-output-container" class="w-full min-h-[300px] p-4 border-2 border-blue-300 rounded-lg text-base bg-gray-50 font-mono resize-none overflow-auto">
-                        <pre><code id="prompt-output" class="language-javascript"></code></pre>
+                        <div id="prompt-output"></div>
                     </div>
                     <!-- Prompt Quality Score Panel -->
                     <div id="quality-panel" class="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-lg hidden">
@@ -1664,7 +1693,8 @@
                     finalPrompt = applyIntensity(finalPrompt, 'camera', intensitySelect.value);
 
                     const formattedPrompt = formatPromptOutput(finalPrompt, outputFormat.value);
-                    promptOutput.innerHTML = Prism.highlight(formattedPrompt, Prism.languages.javascript, 'javascript');
+                    promptOutput.textContent = formattedPrompt;
+                    visualizePrompt();
                     resultSection.style.display = 'block';
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
@@ -1688,31 +1718,17 @@
             // --- Конец новой функции ---
 
             function copyPrompt() {
+                const textToCopy = promptOutput.textContent;
                 if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(promptOutput.textContent)
+                    navigator.clipboard.writeText(textToCopy)
                         .then(() => {
                             showNotification('Промпт скопирован в буфер обмена', 'success');
                         })
                         .catch(err => {
-                            fallbackCopy();
+                             showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
                         });
                 } else {
-                    fallbackCopy();
-                }
-            }
-
-            function fallbackCopy() {
-                try {
-                    const range = document.createRange();
-                    range.selectNodeContents(promptOutput);
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                    document.execCommand('copy');
-                    selection.removeAllRanges();
-                    showNotification('Промпт скопирован в буфер обмена', 'success');
-                } catch (e) {
-                    showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
+                     showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
                 }
             }
             
@@ -1738,6 +1754,8 @@
                 promptOutput.classList.remove('bg-white', 'ring-2', 'ring-blue-500');
                 promptOutput.classList.add('bg-gray-50');
                 
+                visualizePrompt();
+
                 editBtn.innerHTML = `
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     Редактировать
@@ -1810,7 +1828,7 @@
             }
             
             function exportPrompt() {
-                const prompt = promptOutput.value;
+                const prompt = promptOutput.textContent;
                 const negativePrompt = negativePromptTextarea.value.trim();
                 let fullExport = prompt;
                 if (negativePrompt) {
@@ -1839,7 +1857,7 @@
                 };
                 
                 const notification = document.createElement('div');
-                notification.className = `p-4 rounded-lg shadow-xl text-white font-medium mb-3 transition-all duration-300 transform translate-x-full opacity-0 ${colors[type]} flex items-center justify-between`;
+                notification.className = `p-4 rounded-lg shadow-xl text-white font-medium mb-3 ${colors[type]} flex items-center justify-between notification-fade-in`;
                 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = message;
@@ -1856,16 +1874,10 @@
                 notificationContainer.appendChild(notification);
                 
                 setTimeout(() => {
-                    notification.classList.remove('translate-x-full', 'opacity-0');
-                    notification.classList.add('translate-x-0', 'opacity-100');
-                }, 100);
-                
-                setTimeout(() => {
                     if (!hasUndo || !notification.querySelector('button')) {
-                        notification.classList.add('translate-x-full', 'opacity-0');
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 300);
+                        notification.classList.remove('notification-fade-in');
+                        notification.classList.add('notification-fade-out');
+                        notification.addEventListener('animationend', () => notification.remove());
                     }
                 }, 5000);
             }
@@ -2158,7 +2170,7 @@
             }
 
             async function translateToEnglish() {
-                const prompt = promptOutput.value;
+                const prompt = promptOutput.textContent;
                 if (!prompt) {
                     showNotification('Сначала сгенерируйте промпт.', 'warning');
                     return;
@@ -2174,7 +2186,8 @@
                         })
                     });
                     const data = await response.json();
-                    promptOutput.value = data.translatedText;
+                    promptOutput.textContent = data.translatedText;
+                    visualizePrompt();
                     showNotification('Промпт переведен на английский.', 'success');
                 } catch (error) {
                     showNotification('Ошибка перевода.', 'error');
@@ -2243,6 +2256,21 @@
                 }
 
                 promptVisualization.innerHTML = html;
+                updatePresetHighlighting();
+            }
+
+            function visualizePrompt() {
+                const text = promptOutput.textContent;
+                const parts = text.split(',').map(p => p.trim());
+                const html = parts.map(part => {
+                    const [key, ...value] = part.split(':');
+                    const valueStr = value.join(':');
+                    if (valueStr) {
+                        return `<span><span class="text-red-500">${key}:</span><span class="text-blue-500">${valueStr}</span></span>`;
+                    }
+                    return `<span>${part}</span>`;
+                }).join(', ');
+                promptOutput.innerHTML = html;
             }
             // --- History and Favorites Logic ---
             function saveToHistory() {
@@ -2732,7 +2760,7 @@
 
 
             async function generateNegativePrompt() {
-                const positivePrompt = promptOutput.value;
+                const positivePrompt = promptOutput.textContent;
                 if (!positivePrompt) {
                     showNotification('Сначала сгенерируйте основной промпт.', 'warning');
                     return;
@@ -2820,7 +2848,7 @@
 
             async function handleSuggestTags() {
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
-                const prompt = promptOutput.value.trim();
+                const prompt = promptOutput.textContent.trim();
 
                 if (!idea) {
                     showNotification('Please enter an idea to suggest tags.', 'warning');
@@ -2959,7 +2987,7 @@
 
             async function handlePredictProblems() {
                 const idea = [subjectInput.value.trim(), styleLightingInput.value.trim(), qualityResolutionInput.value.trim()].filter(Boolean).join(', ');
-                const prompt = promptOutput.value.trim();
+                const prompt = promptOutput.textContent.trim();
 
                 if (!idea) {
                     showNotification('Please enter an idea to predict problems.', 'warning');
@@ -3080,8 +3108,9 @@
 
             operatingModeSelect.addEventListener('change', handleOperatingModeChange);
             outputFormat.addEventListener('change', () => {
-                const currentPrompt = promptOutput.value;
-                promptOutput.value = formatPromptOutput(currentPrompt, outputFormat.value);
+                const currentPrompt = promptOutput.textContent;
+                promptOutput.textContent = formatPromptOutput(currentPrompt, outputFormat.value);
+                visualizePrompt();
             });
 
             darkModeToggle.addEventListener('change', () => {
@@ -3116,7 +3145,5 @@
     </script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 </body>
 </html>
