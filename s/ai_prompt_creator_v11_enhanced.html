@@ -5,24 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Prompt Creator Pro (Ultimate Edition) v11 Enhanced</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // To prevent FOUC (Flash of Unstyled Content), we set the dark mode class immediately
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <script src="data.js"></script>
-    
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
     <style>
         :root {
             --primary-color: #3B82F6; 
             --secondary-color: #2563EB; 
             --accent-color: #EF4444; 
-            --background-color: #F9FAFB; 
+            --background-color: #F9FAFB;
+            --card-background-color: #FFFFFF;
             --text-color: #1F2937; 
             --light-gray: #E5E7EB; 
             --medium-gray: #6B7280; 
             --dark-gray: #374151; 
             --success-color: #10B981; 
             --warning-color: #F59E0B; 
+            --border-color: #E5E7EB;
         }
+
+        .dark {
+            --background-color: #111827;
+            --card-background-color: #1F2937;
+            --text-color: #F9FAFB;
+            --light-gray: #374151;
+            --dark-gray: #9CA3AF;
+            --border-color: #374151;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             line-height: 1.6;
@@ -90,10 +114,18 @@
                 <img src="https://placehold.co/40x40/3B82F6/FFFFFF?text=AI" alt="AI Prompt Creator" class="rounded-lg">
                 <h1 class="text-2xl font-bold text-blue-600">AI Prompt Creator Pro (Ultimate) v11 Enhanced</h1>
             </div>
-            <nav>
+            <nav class="flex items-center space-x-4">
                 <ul class="flex space-x-4 md:space-x-6">
                     <li><a href="#" class="font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 border-b-2 border-blue-600 pb-1">Главная</a></li>
                 </ul>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-600">Light</span>
+                    <label for="dark-mode-toggle" class="relative inline-flex items-center cursor-pointer mx-2">
+                        <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                    <span class="text-sm font-medium text-gray-600">Dark</span>
+                </div>
             </nav>
         </div>
     </header>
@@ -198,19 +230,24 @@
                         <button data-preset="cel-shaded-comic" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Стилизованный Комикс</button>
                         <button data-preset="street-photography" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Уличная Фотография</button>
                         <button data-preset="steampunk" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Стимпанк</button>
+                        <button data-preset="ai-art" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">AI-Art</button>
+                        <button data-preset="hyper-realistic-macro" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Hyper-Realistic Macro</button>
+                        <button data-preset="glitchcore-vaporwave" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Glitchcore/Vaporwave</button>
+                        <button data-preset="stop-motion-claymation" class="preset-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">Stop-Motion Claymation</button>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">Нажмите, чтобы автоматически заполнить все параметры.</p>
                     <div class="mt-4" id="custom-presets-container"></div>
                     <button id="create-preset-btn" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition-colors duration-200 text-sm font-medium">Создать свой пресет</button>
+                    <button id="generate-custom-preset-btn" class="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 transition-colors duration-200 text-sm font-medium">Сгенерировать пресет (AI)</button>
                 </div>
                 <!-- End Presets Section -->
                 <!-- Detail Level Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg" title="Выберите уровень для автоматического добавления тегов качества и детализации.">
                     <h3 class="text-xl font-semibold mb-5 text-gray-800">2.5. Уровень Детализации:</h3>
                     <div class="flex flex-wrap gap-3" id="detail-level-buttons">
-                        <button data-level="basic" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="high quality, detailed">Basic</button>
-                        <button data-level="detailed" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="masterpiece, best quality, highly detailed, photorealistic, cinematic light">Detailed</button>
-                        <button data-level="masterpiece" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="ultra-detailed, 8k, extremely detailed face, volumetric light, trending on artstation, unreal engine 5, octane render">Masterpiece</button>
+                        <button data-level="basic" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="Добавляет: high quality, detailed">Basic</button>
+                        <button data-level="detailed" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="Добавляет: masterpiece, best quality, highly detailed, photorealistic, cinematic light">Detailed</button>
+                        <button data-level="masterpiece" class="detail-level-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-colors duration-200 text-sm font-medium" title="Добавляет: ultra-detailed, 8k, extremely detailed face, volumetric light, trending on artstation, unreal engine 5, octane render">Masterpiece</button>
                     </div>
                     <p class="text-sm text-gray-500 mt-3">Добавляет теги качества в поле "Дополнительные детали".</p>
                 </div>
@@ -219,21 +256,40 @@
                 <!-- Operating Modes Section -->
                 <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
                     <h3 class="text-xl font-semibold mb-5 text-gray-800">3. Режим Работы:</h3>
-                    <select id="operating-mode" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <select id="operating-mode" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" aria-label="Select Operating Mode">
                         <option value="general" selected>Общий (по умолчанию)</option>
                         <option value="no-names">"Без имен"</option>
                         <option value="base64">"Base64 кодирование"</option>
                     </select>
                     <p class="text-sm text-gray-500 mt-3">Выберите режим для обработки чувствительных элементов в промпте.</p>
+                    <!-- Sub-options for modes -->
+                    <div id="no-names-options" class="hidden mt-4 space-y-2 p-4 bg-gray-50 rounded-lg border">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="no-names-auto-analyze" class="form-checkbox h-5 w-5 text-blue-600">
+                            <span class="ml-2 text-gray-700">Автоматический анализ (рекомендуется)</span>
+                        </label>
+                        <div>
+                            <label for="no-names-exceptions" class="block text-sm font-medium text-gray-700">Список исключений (через запятую):</label>
+                            <input type="text" id="no-names-exceptions" class="w-full p-2 mt-1 border border-gray-300 rounded-lg" placeholder="Например: John, Mary">
+                        </div>
+                    </div>
+                    <div id="base64-options" class="hidden mt-4 space-y-2 p-4 bg-gray-50 rounded-lg border">
+                        <label for="base64-encoding" class="block text-sm font-medium text-gray-700">Тип кодирования:</label>
+                        <select id="base64-encoding" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="base64">Base64</option>
+                            <option value="rot13">ROT13</option>
+                            <option value="url">URL Encoding</option>
+                        </select>
+                    </div>
                 </div>
                 <!-- End Operating Modes Section -->
 
-<div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">4. Введите вашу идею:</h3>
                     <div class="space-y-4">
                         <div>
                             <label for="subject-input" class="block text-sm font-medium text-gray-700">Субъект/Объект (О чем/ком):</label>
-                            <textarea id="subject-input" class="w-full min-h-[80px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: киберпанк-ниндзя"></textarea>
+                            <textarea id="subject-input" class="w-full min-h-[80px] p-4 border border-gray-300 rounded-lg text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Например: киберпанк-ниндзя" aria-label="Subject or Object of the prompt"></textarea>
                         </div>
                         <div>
                             <label for="style-lighting-input" class="block text-sm font-medium text-gray-700">Стиль/Освещение:</label>
@@ -561,8 +617,8 @@
                         <div class="mt-4">
                             <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block">Качество и Рендеринг:</span>
                             <div class="flex flex-wrap gap-2 mt-1" id="quick-tags-quality">
-                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="8K">8K</span>
-                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="4K">4K</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="8K" title="Высокое разрешение">8K</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="4K" title="Высокое разрешение">4K</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Hyperrealism">Гиперреализм</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Photorealistic">Фотореализм</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Unreal Engine 5">Unreal Engine 5</span>
@@ -577,8 +633,8 @@
                             
                             <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block">Атмосфера и Эффекты:</span>
                             <div class="flex flex-wrap gap-2 mt-1" id="quick-tags-atmosphere">
-                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Volumetric Lighting">Объемный свет</span>
-                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Cinematic Grain">Кинозерно</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Volumetric Lighting" title="Добавляет глубину и видимые лучи света">Объемный свет</span>
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Cinematic Grain" title="Имитирует зернистость пленки">Кинозерно</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Depth of Field">Глубина резкости</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Bokeh">Боке</span>
                                 <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors duration-200 cursor-pointer" data-tag="Rain">Дождь</span>
@@ -636,8 +692,8 @@
                         <div class="mt-4">
                             <span class="text-sm font-semibold text-gray-600 mt-3 mb-1 block text-red-700">Быстрые негативные теги:</span>
                             <div class="flex flex-wrap gap-2 mt-1" id="negative-tags-container">
-                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="low quality">Низкое качество</span>
-                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="blurry">Размытость</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="low quality" title="Исключает изображения низкого качества">Низкое качество</span>
+                                <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="blurry" title="Исключает размытые изображения">Размытость</span>
                                 <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="watermark">Водяной знак</span>
                                 <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="text">Текст</span>
                                 <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium hover:bg-red-100 transition-colors duration-200 cursor-pointer" data-tag="bad anatomy">Плохая анатомия</span>
@@ -671,8 +727,20 @@
 
                 <!-- Result Section -->
                 <div id="result-section" class="mt-12 p-6 bg-white rounded-xl shadow-2xl hidden">
-                    <h3 class="text-2xl font-bold mb-4 text-blue-600">8. Готовый Промпт:</h3>
-                    <textarea id="prompt-output" readonly class="w-full min-h-[300px] p-4 border-2 border-blue-300 rounded-lg text-base bg-gray-50 font-mono resize-none"></textarea>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-bold text-blue-600">8. Готовый Промпт:</h3>
+                        <div>
+                            <label for="output-format" class="text-sm font-medium text-gray-700">Формат вывода:</label>
+                            <select id="output-format" class="p-2 border border-gray-300 rounded-lg">
+                                <option value="comma">Через запятую</option>
+                                <option value="bullet">Список</option>
+                                <option value="flags">Флаги</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="prompt-output-container" class="w-full min-h-[300px] p-4 border-2 border-blue-300 rounded-lg text-base bg-gray-50 font-mono resize-none overflow-auto">
+                        <pre><code id="prompt-output" class="language-javascript"></code></pre>
+                    </div>
                     <!-- Prompt Quality Score Panel -->
                     <div id="quality-panel" class="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-lg hidden">
                         <h3 class="text-lg font-semibold text-gray-800 mb-3">📊 Оценка качества промпта</h3>
@@ -844,6 +912,7 @@
             const historyList = document.getElementById('history-list');
             const favoritesList = document.getElementById('favorites-list');
             const addToFavoritesBtn = document.getElementById('add-to-favorites-btn');
+            const generateCustomPresetBtn = document.getElementById('generate-custom-preset-btn');
 
             const HISTORY_KEY = 'aiPromptCreatorHistoryV11';
             const FAVORITES_KEY = 'aiPromptCreatorFavoritesV11';
@@ -854,6 +923,11 @@
             const promptVisualization = document.getElementById('prompt-visualization');
             const presetFilter = document.getElementById('preset-filter');
             const presetSort = document.getElementById('preset-sort');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const noNamesOptions = document.getElementById('no-names-options');
+            const outputFormat = document.getElementById('output-format');
+            const base64Options = document.getElementById('base64-options');
+
 
             // --- Расширенные карты параметров ---
             const styleMap = {
@@ -1308,6 +1382,18 @@
                 },
                 'steampunk': {
                     style: 'steampunk', camera: 'medium-shot', lighting: 'warm', cinematography: '16:9', mood: 'historical', effect: 'smoke-fog', background: 'abandoned-factory', audio: 'ambient', details: 'steampunk aesthetic, brass, gears, cogs, Victorian era, goggles', negative: 'modern, futuristic, plastic, minimalist'
+                },
+                'ai-art': {
+                    style: 'abstract', camera: 'dolly-zoom', lighting: 'neon', cinematography: '16:9', mood: 'surreal', effect: 'glitch', background: 'abstract-geometric', audio: 'electronic-trance', details: 'neural network style, generative art, abstract patterns, vibrant colors, flowing textures', negative: 'realistic, photorealistic, human figures, symmetrical'
+                },
+                'hyper-realistic-macro': {
+                    style: 'hyperrealism', camera: 'macro-shot', lighting: 'soft', cinematography: '1:1', mood: 'calm', effect: 'depth-of-field', background: 'nature-forest', audio: 'ambient', details: 'extreme close-up, highly detailed textures, shallow depth of field, 8K, photorealistic', negative: 'blurry, out of focus, wide shot, cartoon'
+                },
+                'glitchcore-vaporwave': {
+                    style: 'glitch-art', camera: 'dutch-angle', lighting: 'neon', cinematography: '4:3', mood: 'nostalgic', effect: 'vhs', background: 'urban-city', audio: 'synthwave-music', details: 'glitch effects, datamoshing, VHS static, pink and blue neon, retro computer graphics, vaporwave aesthetic', negative: 'clean, modern, high-definition, smooth, natural colors'
+                },
+                'stop-motion-claymation': {
+                    style: 'claymation', camera: 'medium-shot', lighting: 'studio-light', cinematography: '4:3', mood: 'whimsical', effect: 'stop-motion', background: 'abstract-geometric', audio: 'folk', details: 'plasticine characters, handcrafted feel, slight imperfections, tangible textures, stop motion animation', negative: 'realistic, CGI, smooth animation, hyperdetailed'
                 }
             };
             // --- Конец расширенных карт параметров ---
@@ -1337,31 +1423,80 @@
                 saveState();
             }
 
-            function applyIntensity(prompt) {
-                const intensitySelect = document.getElementById('intensity-select');
-                const intensity = intensitySelect.value;
-                if (intensity === 'slightly') {
-                    prompt = prompt.replace('fog', 'slightly foggy');
-                } else if (intensity === 'moderately') {
-                    prompt = prompt.replace('fog', 'moderately smoky');
-                } else if (intensity === 'extremely') {
-                    prompt = prompt.replace('fog', 'extremely dense fog');
+            function applyIntensity(prompt, parameter, intensity) {
+                const intensityMap = {
+                    lighting: {
+                        slightly: 'soft ambient light, subtle rim lighting',
+                        moderately: 'dynamic volumetric lighting, strong key light',
+                        extremely: 'dramatic chiaroscuro, intense neon glow, overexposed highlights'
+                    },
+                    camera: {
+                        slightly: 'shallow depth of field, subtle camera shake',
+                        moderately: 'cinematic wide shot, moderate motion blur',
+                        extremely: 'extreme close-up, aggressive camera movement, hyper-detailed focus'
+                    }
+                };
+
+                if (intensityMap[parameter] && intensityMap[parameter][intensity]) {
+                    return prompt + ', ' + intensityMap[parameter][intensity];
                 }
                 return prompt;
             }
 
-            function formatPromptOutput(prompt) {
-                // Check for flags and format accordingly
-                const flags = prompt.match(/--[a-z]+\s\d+:\d+/g);
-                if (flags) {
-                    let formattedPrompt = prompt;
-                    flags.forEach(flag => {
-                        formattedPrompt = formattedPrompt.replace(flag, `\n- ${flag}`);
-                    });
-                    return formattedPrompt;
+            async function generateCustomPreset() {
+                const idea = subjectInput.value.trim();
+                if (!idea) {
+                    showNotification('Please enter an idea to generate a preset.', 'warning');
+                    return;
                 }
-                // Default to bullet points for comma-separated values
-                return prompt.split(',').map(item => `- ${item.trim()}`).join('\n');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/generate-custom-preset', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            idea: idea,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+                    const preset = await response.json();
+
+                    // Apply the generated preset
+                    styleSelect.value = preset.style;
+                    document.getElementById('camera').value = preset.camera;
+                    document.getElementById('lighting').value = preset.lighting;
+                    document.getElementById('cinematography').value = preset.cinematography;
+                    document.getElementById('mood').value = preset.mood;
+                    document.getElementById('effect').value = preset.effect;
+                    document.getElementById('background').value = preset.background;
+                    document.getElementById('audio').value = preset.audio;
+                    detailsTextarea.value = preset.details;
+                    negativePromptTextarea.value = preset.negative;
+
+                    showNotification('AI-generated preset applied!', 'success');
+                    saveState();
+
+                } catch (error) {
+                    showNotification('Error generating custom preset.', 'error');
+                }
+            }
+
+            function formatPromptOutput(prompt, format = 'comma') {
+                const parts = prompt.split(',').map(p => p.trim()).filter(Boolean);
+                switch (format) {
+                    case 'bullet':
+                        return parts.map(part => `- ${part}`).join('\n');
+                    case 'flags':
+                        return parts.map(part => {
+                            if (part.includes(':')) {
+                                const [key, value] = part.split(':');
+                                return `--${key.trim().replace(/\s+/g, '-')} ${value.trim()}`;
+                            }
+                            return part;
+                        }).join(' ');
+                    default:
+                        return prompt;
+                }
             }
             
             function toggleModelSelection() {
@@ -1524,7 +1659,12 @@
                     const data = await response.json();
                     
                     // 5. Отображение результата от Gemini
-                    promptOutput.value = formatPromptOutput(data.generatedPrompt);
+                    let finalPrompt = data.generatedPrompt;
+                    finalPrompt = applyIntensity(finalPrompt, 'lighting', intensitySelect.value);
+                    finalPrompt = applyIntensity(finalPrompt, 'camera', intensitySelect.value);
+
+                    const formattedPrompt = formatPromptOutput(finalPrompt, outputFormat.value);
+                    promptOutput.innerHTML = Prism.highlight(formattedPrompt, Prism.languages.javascript, 'javascript');
                     resultSection.style.display = 'block';
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
@@ -1549,7 +1689,7 @@
 
             function copyPrompt() {
                 if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(promptOutput.value)
+                    navigator.clipboard.writeText(promptOutput.textContent)
                         .then(() => {
                             showNotification('Промпт скопирован в буфер обмена', 'success');
                         })
@@ -1563,8 +1703,13 @@
 
             function fallbackCopy() {
                 try {
-                    promptOutput.select();
+                    const range = document.createRange();
+                    range.selectNodeContents(promptOutput);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
                     document.execCommand('copy');
+                    selection.removeAllRanges();
                     showNotification('Промпт скопирован в буфер обмена', 'success');
                 } catch (e) {
                     showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
@@ -1572,7 +1717,7 @@
             }
             
             function editPrompt() {
-                promptOutput.removeAttribute('readonly');
+                promptOutput.setAttribute('contenteditable', 'true');
                 promptOutput.classList.add('bg-white', 'ring-2', 'ring-blue-500');
                 promptOutput.classList.remove('bg-gray-50');
                 promptOutput.focus();
@@ -1589,7 +1734,7 @@
             }
             
             function saveEditedPrompt() {
-                promptOutput.setAttribute('readonly', true);
+                promptOutput.setAttribute('contenteditable', 'false');
                 promptOutput.classList.remove('bg-white', 'ring-2', 'ring-blue-500');
                 promptOutput.classList.add('bg-gray-50');
                 
@@ -2064,12 +2209,12 @@
                 let currentNegativeText = negativePromptTextarea.value;
 
                 if (currentNegativeText.length > 200) {
-                    const commonNegativeTags = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+                    const commonNegativeTags = /\b(blurry|low quality|bad anatomy|deformed|watermark|text|signature|artifacts|poorly drawn|extra limbs|missing limbs|mutated|disfigured|out of frame|cropped)\b,? */gi;
                     let cleanedText = currentNegativeText.replace(commonNegativeTags, '');
                     // Clean up trailing commas and whitespace
                     cleanedText = cleanedText.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
                     negativePromptTextarea.value = cleanedText;
-                    showNotification('Common negative tags (bad anatomy, low quality, artifacts) removed.', 'info');
+                    showNotification('Common negative tags removed.', 'info');
                 } else {
                     negativePromptTextarea.value = '';
                     showNotification('Negative prompt cleared.', 'info');
@@ -2438,10 +2583,10 @@
 
 
             // --- Слушатели событий ---
-            const aiAutopilotBtn = document.getElementById('ai-autopilot-btn'); // <-- ДОБАВЬТЕ ЭТО
+            const aiAutopilotBtn = document.getElementById('ai-autopilot-btn');
             improveBtn.addEventListener('click', () => generatePrompt(false));
             superImproveBtn.addEventListener('click', () => generatePrompt(true));
-            aiAutopilotBtn.addEventListener('click', () => generatePrompt(false, 'auto-pilot')); // <-- И ДОБАВЬТЕ ЭТО
+            aiAutopilotBtn.addEventListener('click', () => generatePrompt(false, 'auto-pilot'));
             copyBtn.addEventListener('click', copyPrompt);
             editBtn.addEventListener('click', editPrompt);
             durationSlider.addEventListener('input', updateDurationValue);
@@ -2499,7 +2644,10 @@
                 select.addEventListener('change', updatePromptVisualization);
                 select.addEventListener('change', updatePresetHighlighting);
             });
-            document.querySelectorAll('textarea').forEach(textarea => textarea.addEventListener('input', updatePromptVisualization));
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.addEventListener('input', updatePromptVisualization);
+                textarea.addEventListener('input', updatePresetHighlighting);
+            });
             document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', updatePromptVisualization));
             
             // Инициализация
@@ -2632,19 +2780,36 @@
                 'sen to chihiro no kamikakushi': { studio: 'Studio Ghibli', style: 'Traditional Hand-Drawn' }
             };
 
-            function handleAnimeTitleInput() {
-                const title = animeTitleInput.value.trim().toLowerCase();
-                const suggestion = animeTitleSuggestions[title];
+            async function handleAnimeTitleInput() {
+                const title = animeTitleInput.value.trim();
+                if (title.length < 3) return;
 
-                if (suggestion) {
-                    if (suggestion.studio) {
-                        animeStudioSelect.value = suggestion.studio;
+                try {
+                    const response = await fetch('http://localhost:3000/api/anime-auto-fill', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: title,
+                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                        })
+                    });
+                    const data = await response.json();
+
+                    if (data.studio) {
+                        animeStudioSelect.value = data.studio;
                     }
-                    if (suggestion.style) {
-                        animeStyleSelect.value = suggestion.style;
+                    if (data.style) {
+                        animeStyleSelect.value = data.style;
                     }
-                    showNotification(`Автозаполнение для "${animeTitleInput.value}"`, 'success');
+                    if (data.artist) {
+                        document.getElementById('anime-artist').value = data.artist;
+                    }
+
+                    showNotification(`Auto-filled for "${title}"`, 'success');
                     saveState();
+
+                } catch (error) {
+                    console.error('Anime auto-fill failed:', error);
                 }
             }
 
@@ -2859,6 +3024,7 @@
             addToFavoritesBtn.addEventListener('click', addToFavorites);
             historyTab.addEventListener('click', () => switchTab('history'));
             favoritesTab.addEventListener('click', () => switchTab('favorites'));
+            generateCustomPresetBtn.addEventListener('click', generateCustomPreset);
 
             historyList.addEventListener('click', e => {
                 if (e.target.classList.contains('reuse-btn')) {
@@ -2905,7 +3071,52 @@
                     behavior: 'smooth'
                 });
             });
+
+            function handleOperatingModeChange() {
+                const selectedMode = operatingModeSelect.value;
+                noNamesOptions.classList.toggle('hidden', selectedMode !== 'no-names');
+                base64Options.classList.toggle('hidden', selectedMode !== 'base64');
+            }
+
+            operatingModeSelect.addEventListener('change', handleOperatingModeChange);
+            outputFormat.addEventListener('change', () => {
+                const currentPrompt = promptOutput.value;
+                promptOutput.value = formatPromptOutput(currentPrompt, outputFormat.value);
+            });
+
+            darkModeToggle.addEventListener('change', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('darkMode', darkModeToggle.checked);
+            });
+
+            // The initial class is now set in the <head> to prevent FOUC.
+            // We just need to ensure the toggle switch reflects the current state.
+            if (document.documentElement.classList.contains('dark')) {
+                darkModeToggle.checked = true;
+            }
+
+            tippy('[title]', {
+                animation: 'scale-subtle',
+                arrow: true,
+            });
+
+            improveBtn.setAttribute('aria-label', 'Improve Prompt');
+            superImproveBtn.setAttribute('aria-label', 'Super Improve Prompt');
+            resetParamsBtn.setAttribute('aria-label', 'Reset Parameters');
+            randomPromptBtn.setAttribute('aria-label', 'Generate Random Prompt');
+            copyBtn.setAttribute('aria-label', 'Copy Prompt');
+            editBtn.setAttribute('aria-label', 'Edit Prompt');
+            regenerateBtn.setAttribute('aria-label', 'Regenerate Prompt');
+            exportBtn.setAttribute('aria-label', 'Export Prompt');
+            addToFavoritesBtn.setAttribute('aria-label', 'Add to Favorites');
+            createPresetBtn.setAttribute('aria-label', 'Create Custom Preset');
+            generateCustomPresetBtn.setAttribute('aria-label', 'Generate Custom Preset with AI');
+
         });
     </script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 </body>
 </html>

@@ -122,6 +122,16 @@ const ideasSchema = Joi.object({
   type: Joi.string().valid('subject', 'style', 'quality').default('subject')
 });
 
+const customPresetSchema = Joi.object({
+    idea: Joi.string().min(3).required(),
+    generationModel: Joi.string().optional()
+});
+
+const animeAutoFillSchema = Joi.object({
+    title: Joi.string().min(1).required(),
+    generationModel: Joi.string().optional()
+});
+
 // Middleware для валидации (из V11)
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
@@ -216,7 +226,9 @@ const generatePromptHandler = async (req, res, next) => {
     // --- Логика "Режима Работы" ---
     if (operatingMode === 'no-names') {
         logger.info('Applying no-names filter...');
-        const noNamesPrompt = `Перепиши промпт, избегая любых конкретных имен людей, брендов, персонажей или собственных названий. Заменяй их на детальные описательные фразы, которые точно передают уникальные черты, внешность, способности и роль оригинала, чтобы это оставалось узнаваемым как именно этот персонаж/объект, но без прямого упоминания имени. Сохрани весь оригинальный смысл, детали, сюжет и контекст. Не обобщай — делай описание специфичным.
+        const exceptions = parameters.exceptions || [];
+        const exceptionsText = exceptions.length > 0 ? `КРОМЕ СЛЕДУЮЩИХ ИСКЛЮЧЕНИЙ: ${exceptions.join(', ')}` : '';
+        const noNamesPrompt = `Перепиши промпт, избегая любых конкретных имен людей, брендов, персонажей или собственных названий. ${exceptionsText}. Заменяй их на детальные описательные фразы, которые точно передают уникальные черты, внешность, способности и роль оригинала, чтобы это оставалось узнаваемым как именно этот персонаж/объект, но без прямого упоминания имени. Сохрани весь оригинальный смысл, детали, сюжет и контекст. Не обобщай — делай описание специфичным.
 
 Примеры:
 - Вместо "Batman" — "темный рыцарь в черном плаще с ушами летучей мыши, борющийся с преступностью в готическом городе с помощью гаджетов".
@@ -231,23 +243,32 @@ const generatePromptHandler = async (req, res, next) => {
         generatedPrompt = noNamesResult.response.text().trim();
 
     } else if (operatingMode === 'base64') {
-        logger.info('Applying base64 filter (AI-enhanced)...');
-        const base64Prompt = `Проанализируй текст и закодируй в base64 только конкретные собственные имена людей, брендов, персонажей или названий (начинающиеся с заглавной буквы). Не кодируй обычные слова, даже если они с заглавной. Сохрани весь остальной текст без изменений, чтобы смысл остался intact. Используй Buffer.from(match).toString('base664') для кодирования.
+        const encoding = parameters.encoding || 'base64';
+        logger.info(`Applying ${encoding} filter...`);
+        if (encoding === 'rot13') {
+            generatedPrompt = generatedPrompt.replace(/[a-zA-Z]/g, function(c){
+                return String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+            });
+        } else if (encoding === 'url') {
+            generatedPrompt = encodeURIComponent(generatedPrompt);
+        } else { // base64
+            const base64Prompt = `Проанализируй текст и закодируй в base64 только конкретные собственные имена людей, брендов, персонажей или названий (начинающиеся с заглавной буквы). Не кодируй обычные слова, даже если они с заглавной. Сохрани весь остальной текст без изменений, чтобы смысл остался intact. Используй Buffer.from(match).toString('base664') для кодирования.
 
-        Примеры:
-        - Оригинал: "Batman fights in Gotham"
-          Выход: "QmF0bWFu fights in R290aGFt" (закодированы Batman и Gotham как собственные имена).
-        - Оригинал: "The quick brown fox"
-          Выход: "The quick brown fox" (ничего не закодировано, так как нет собственных имен).
-        - Оригинал: "Visit Google headquarters"
-          Выход: "Visit R29vZ2xl headquarters" (закодировано только Google как бренд).
+            Примеры:
+            - Оригинал: "Batman fights in Gotham"
+              Выход: "QmF0bWFu fights in R290aGFt" (закодированы Batman и Gotham как собственные имена).
+            - Оригинал: "The quick brown fox"
+              Выход: "The quick brown fox" (ничего не закодировано, так как нет собственных имен).
+            - Оригинал: "Visit Google headquarters"
+              Выход: "Visit R29vZ2xl headquarters" (закодировано только Google как бренд).
 
-        Отвечай только модифицированным текстом, без объяснений.
+            Отвечай только модифицированным текстом, без объяснений.
 
-        Текст: "${generatedPrompt}"`;
+            Текст: "${generatedPrompt}"`;
 
-        const base64Result = await model.generateContent(base64Prompt);
-        generatedPrompt = base64Result.response.text().trim();
+            const base64Result = await model.generateContent(base64Prompt);
+            generatedPrompt = base64Result.response.text().trim();
+        }
     }
     // --- Конец логики "Режима Работы" ---
 
@@ -332,7 +353,7 @@ const generateNegativePromptHandler = async (req, res, next) => {
         let generatedNegative = result.response.text().trim();
 
         if (clean) {
-            const commonErrors = /\b(bad anatomy|low quality|artifacts)\b,? */gi;
+            const commonErrors = /\b(blurry|low quality|bad anatomy|deformed|watermark|text|signature|artifacts|poorly drawn|extra limbs|missing limbs|mutated|disfigured|out of frame|cropped)\b,? */gi;
             generatedNegative = generatedNegative.replace(commonErrors, '');
             generatedNegative = generatedNegative.replace(/, *,/g, ',').replace(/^, *|, *$/g, '').trim();
         }
@@ -392,6 +413,71 @@ const generateIdeasHandler = async (req, res, next) => {
     }
 };
 
+const generateCustomPresetHandler = async (req, res, next) => {
+    try {
+        const { idea, generationModel } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        logger.info(`Using model (Custom Preset): ${modelName}`);
+
+        const prompt = `
+            You are a creative assistant for a video prompt generator. Your task is to generate a complete preset based on a user's idea.
+            The output MUST be a valid JSON object that matches this structure:
+            {
+              "style": "...",
+              "camera": "...",
+              "lighting": "...",
+              "cinematography": "...",
+              "mood": "...",
+              "effect": "...",
+              "background": "...",
+              "audio": "...",
+              "details": "...",
+              "negative": "..."
+            }
+            Do not include any explanations, just the JSON object.
+            User's idea: "${idea}"
+        `;
+
+        const result = await model.generateContent(prompt);
+        const presetText = result.response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+        const preset = JSON.parse(presetText);
+        res.json(preset);
+        logger.info('Custom preset generated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+const animeAutoFillHandler = async (req, res, next) => {
+    try {
+        const { title, generationModel } = req.body;
+        const modelName = generationModel || 'gemini-2.5-flash';
+        const model = genAI.getGenerativeModel({ model: modelName });
+        logger.info(`Using model (Anime Auto-fill): ${modelName}`);
+
+        const prompt = `
+            Based on the anime title "${title}", provide the animation studio, the art style, and a prominent artist associated with it.
+            The output MUST be a valid JSON object with "studio", "style", and "artist" keys.
+            For example, for "Spirited Away", the output should be:
+            {
+              "studio": "Studio Ghibli",
+              "style": "Hayao Miyazaki style, detailed background art",
+              "artist": "Hayao Miyazaki"
+            }
+            Do not include any explanations, just the JSON object.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const autoFillText = result.response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+        const autoFill = JSON.parse(autoFillText);
+        res.json(autoFill);
+        logger.info('Anime auto-fill successful');
+    } catch (error) {
+        next(error);
+    }
+};
+
 // --- Маршруты ---
 // Используем middleware валидации из V11 для всех маршрутов
 app.post('/api/generate-prompt', validate(promptSchema), generatePromptHandler);
@@ -400,6 +486,8 @@ app.post('/api/predict-problems', validate(problemsSchema), predictProblemsHandl
 app.post('/api/generate-negative-prompt', validate(negativePromptSchema), generateNegativePromptHandler);
 app.post('/api/translate', validate(translateSchema), translateHandler);
 app.post('/api/generate-ideas', validate(ideasSchema), generateIdeasHandler);
+app.post('/api/generate-custom-preset', validate(customPresetSchema), generateCustomPresetHandler);
+app.post('/api/anime-auto-fill', validate(animeAutoFillSchema), animeAutoFillHandler);
 
 // --- Централизованная обработка ошибок (из V11) ---
 app.use((err, req, res, next) => {
