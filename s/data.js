@@ -31,8 +31,7 @@ const dropdownData = {
         "photogrammetry": "Фотограмметрия",
         "tilt-shift": "Тилт-шифт (Миниатюра)",
         "claymation": "Пластилиновая анимация",
-        "rotoscoping": "Ротоскопирование",
-        "ai-art": "AI-Art (neural network style, generative art)"
+        "rotoscoping": "Ротоскопирование"
     },
     intensity: {
         "slightly": "Slightly",
