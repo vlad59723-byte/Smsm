@@ -1291,9 +1291,8 @@
                     
                     // 5. Отображение результата от Gemini
                     let finalPrompt = data.generatedPrompt;
-                    currentRawPrompt = finalPrompt;
-                    updatePromptOutput();
-                    resultSection.style.display = 'block';
+                    currentRawPrompt = finalPrompt; // Сохраняем "чистый" промпт с сервера
+                    updatePromptOutput(); // Вызываем отрисовку
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
                     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
