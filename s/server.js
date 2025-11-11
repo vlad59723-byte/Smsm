@@ -84,9 +84,14 @@ const promptSchema = Joi.object({
     sceneComplexity: Joi.number().min(1).max(10),
     intensityLevels: Joi.string().valid('slightly', 'moderately', 'extremely'),
     generationModel: Joi.string().optional()
-  }).unknown(true),
+  }).unknown(true), // .unknown(true) позволяет 'parameters' содержать любые ключи
   mode: Joi.string().valid('auto-pilot', 'super-improve', 'improve').required(),
-  operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional()
+  operatingMode: Joi.string().valid('general', 'no-names', 'base64').optional(),
+  
+  // Добавляем поля для Режимов Работы, чтобы Joi их пропускал, если они есть
+  noNamesAutoAnalyze: Joi.boolean().optional(),
+  noNamesExceptions: Joi.string().allow('').optional(),
+  base64Encoding: Joi.string().valid('base64', 'rot13', 'url').optional()
 });
 
 // Схема для /generate-tags (из V11)
@@ -174,6 +179,12 @@ function addComplexityDetails(prompt, sceneComplexity) {
     return prompt;
 }
 
+//
+// --- НАЧАЛО ЗАМЕНЫ ---
+// Старая функция generatePromptHandler (строки 164-263) УДАЛЕНА
+// и заменена этой новой версией.
+//
+
 const generatePromptHandler = async (req, res, next) => {
   try {
     const { idea, parameters, mode, operatingMode } = req.body;
@@ -181,39 +192,52 @@ const generatePromptHandler = async (req, res, next) => {
     const model = genAI.getGenerativeModel({ model: modelName });
     logger.info(`Using model (Prompt): ${modelName}, Mode: ${mode}, OperatingMode: ${operatingMode}`);
 
-    // --- ИСПРАВЛЕННАЯ ЛОГИКА ---
-    // systemInstruction должен определяться для ВСЕХ режимов,
-    // иначе 'improve' и 'super-improve' вызовут ошибку.
+    let systemInstruction; // Объявляем заранее
 
-    let systemInstruction;
-    
-    // Используем 'if (mode)' или проверяем все валидные режимы
-    if (mode === 'auto-pilot' || mode === 'super-improve' || mode === 'improve') {
-      
-      // --- УЛУЧШЕННЫЙ ПРОМПТ ---
-      systemInstruction = `
+    // --- НОВАЯ ЛОГИКА С РАЗДЕЛЕНИЕМ ПРОМПТОВ ---
+
+    if (mode === 'auto-pilot') {
+        // --- СПЕЦИАЛЬНЫЙ ПРОМПТ ДЛЯ АВТОПИЛОТА ---
+        systemInstruction = `
+Вы — элитный AI-режиссер и эксперт по prompt engineering для Sora и Veo.
+Ваша задача: полностью взять на себя творческое управление.
+На основе базовой идеи пользователя, вы ДОЛЖНЫ:
+
+1.  **Самостоятельно выбрать** ЛУЧШИЕ параметры (стиль, движение камеры, освещение, кинематография, настроение, эффекты, фон, аудио).
+2.  **Игнорировать** любые параметры, которые мог прислать пользователь (кроме 'idea'). Ваше творческое видение в приоритете.
+3.  **Создать** единый, богатый, профессиональный и детализированный промпт для видео.
+4.  Интегрировать выбранные вами параметры в текст естественно, как описание сцены.
+5.  Добавить 3-5 тегов качества (например, 8K, ultra-detailed, cinematic lighting).
+
+ИСХОДНАЯ ИДЕЯ: "${idea}"
+
+ПРИМЕР ВЫВОДА (для идеи "котенок спит"):
+"A tiny, fluffy ginger kitten is curled up asleep on a sun-drenched windowsill, cinematic close-up shot, soft natural lighting creates a warm glow, peaceful mood, dust particles dance in the volumetric god-rays, 8K, photorealistic, extremely detailed fur."
+
+ПРАВИЛА ВЫВОДА (Критично):
+Ответ ДОЛЖЕН содержать ТОЛЬКО текст итогового промпта на русском языке. Никаких объяснений, предисловий, JSON или "служебного" текста.
+`;
+
+    } else if (mode === 'super-improve' || mode === 'improve') {
+        // --- СТАНДАРТНЫЙ ПРОМПТ ДЛЯ 'improve' И 'super-improve' ---
+        systemInstruction = `
 Вы — эксперт по prompt engineering для видео-генераторов Sora и Veo. Ваша роль: превратить базовую идею и параметры в единый, профессиональный, детализированный промпт.
 
 ИСХОДНЫЕ ДАННЫЕ:
 Базовая идея: "${idea}"
-Режим: ${mode === 'super-improve' ? 'Максимально детализировать с креативными метафорами' : mode === 'improve' ? 'Улучшить с акцентом на детали' : 'Автопилот — выбрать оптимальные параметры'}
+Режим: ${mode === 'super-improve' ? 'Максимально детализировать с креативными метафорами' : 'Улучшить с акцентом на детали'}
 Параметры: ${JSON.stringify(parameters, null, 2)}
 
 ШАГИ ГЕНЕРАЦИИ:
 1. Проанализируйте идею: разбейте на ключевые элементы (субъект, действие, окружение).
-2. Интегрируйте параметры: добавьте стиль, камеру, освещение как фразы (например, "cinematic wide shot, volumetric lighting").
-3. Добавьте креативность: для 'super-improve' используйте визуальные метафоры (например, "как в эпическом фильме Нолана"); для других — будьте лаконичны.
-4. Завершите секциями: если есть "НЕГАТИВНЫЙ ПРОМПТ" или "ДЛИТЕЛЬНОСТЬ", добавьте их в конце как отдельные строки с заголовками.
-5. Обеспечьте связность: промпт должен быть одним coherent текстом, без повторений.
-
-ПРИМЕР:
-Вход: Идея "кошка в космосе", параметры {style: "sci-fi"}.
-Выход: "Космическая кошка плывет в невесомости среди звезд, sci-fi стиль, dynamic camera movement. НЕГАТИВНЫЙ ПРОМПТ: blurry, low quality. ДЛИТЕЛЬНОСТЬ: 10 секунд."
+2. Интегрируйте параметры: ОБЯЗАТЕЛЬНО используйте все параметры, предоставленные пользователем. Добавьте их как фразы (например, "cinematic wide shot, volumetric lighting").
+3. Добавьте креативность: для 'super-improve' используйте визуальные метафоры (например, "как в эпическом фильме Нолана").
+4. Завершите секциями: если в параметрах есть "negative", "duration" или "audio", добавьте их в конце как отдельные строки с заголовками (например, "АУДИО: эпичная музыка").
+5. Обеспечьте связность: промпт должен быть одним coherent текстом.
 
 ПРАВИЛА ВЫВОДА (Критично)
-6. Ответ ДОЛЖЕН содержать ТОЛЬКО текст итогового промпта на русском языке. Никаких объяснений, предисловий, JSON, пояснений, маркировки, доп. полей или другого "служебного" текста. 
+6. Ответ ДОЛЖЕН содержать ТОЛЬКО текст итогового промпта на русском языке. Никаких объяснений, предисловий, JSON или "служебного" текста. 
 `;
-
     } else {
         // Эта ветка не должна сработать из-за Joi, но это защита от ошибок
         logger.error(`Invalid mode received: ${mode}`);
@@ -223,7 +247,8 @@ const generatePromptHandler = async (req, res, next) => {
     const result = await model.generateContent(systemInstruction);
     let generatedPrompt = result.response.text().trim(); 
 
-    // Применяем улучшенные функции
+    // --- ОБЩАЯ ЛОГИКА ДЛЯ ВСЕХ РЕЖИМОВ (Применение доп. параметров) ---
+    // (Автопилот уже может их включить, но мы добавим их на всякий случай, если он забудет)
     generatedPrompt = addComplexityDetails(generatedPrompt, parameters.sceneComplexity);
     generatedPrompt = applyIntensity(generatedPrompt, parameters.intensityLevels);
 
@@ -236,10 +261,10 @@ const generatePromptHandler = async (req, res, next) => {
         generatedPrompt += ', extremely dense fog';
     }
 
-
     // --- Логика "Режима Работы" ---
     if (operatingMode === 'no-names') {
         logger.info('Applying no-names filter...');
+        // Валидация Joi уже пропустила эти поля, если они были
         const exceptions = req.body.noNamesExceptions || '';
         const exceptionsText = exceptions.length > 0 ? `КРОМЕ СЛЕДУЮЩИХ ИСКЛЮЧЕНИЙ: ${exceptions}` : '';
         const noNamesPrompt = `Перепиши промпт, избегая любых конкретных имен людей, брендов, персонажей или собственных названий. ${exceptionsText}. Заменяй их на детальные описательные фразы, которые точно передают уникальные черты, внешность, способности и роль оригинала, чтобы это оставалось узнаваемым как именно этот персонаж/объект, но без прямого упоминания имени. Сохрани весь оригинальный смысл, детали, сюжет и контекст. Не обобщай — делай описание специфичным.
@@ -277,6 +302,10 @@ const generatePromptHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+//
+// --- КОНЕЦ ЗАМЕНЫ ---
+//
 
 // Обработчик /api/generate-tags (из V11)
 const generateTagsHandler = async (req, res, next) => {
