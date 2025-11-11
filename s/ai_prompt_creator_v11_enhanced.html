@@ -1155,60 +1155,87 @@
 
             function getParameterValue(id) {
                 const select = document.getElementById(id);
-                // Fix for elements that are not in a collapsible group, like 'quality'
+                if (!select) return null; // Добавим проверку на всякий случай
+                // 1. Проверяем, включен ли этот параметр
                 const group = select.closest('.parameter-group');
                 if (group) {
-                    const toggle = group.querySelector(`#toggle-${id}`);
+                    // Используем более надежный селектор, чтобы найти любую "галочку" в группе
+                    const toggle = group.querySelector('.toggle-checkbox'); 
                     if (toggle && !toggle.checked) {
-                        return null; // Parameter is disabled
+                        return null; // Параметр отключен
                     }
                 }
                 
-                // Return the direct value from the select element
-                return select.value;
-            }
-// !!! ВОТ НОВАЯ ФУНКЦИЯ, КОТОРУЮ МЫ ДОБАВИЛИ !!!
-            function collectAllParameters() {
-                const selectedModel = document.querySelector('input[name="model"]:checked').value;
-                const intensitySelect = document.getElementById('intensity-select');
-                
-                const parameters = {
-                    sceneComplexity: sceneComplexitySlider.value,
-                    fogIntensity: fogIntensitySelect.value,
-                    intensityLevels: intensitySelect.value,
-                    style: getParameterValue('style'),
-                    camera: getParameterValue('camera'),
-                    lighting: getParameterValue('lighting'),
-                    cinematography: getParameterValue('cinematography'),
-                    mood: getParameterValue('mood'),
-                    effect: getParameterValue('effect'),
-                    photoAnimation: getParameterValue('photo-animation'),
-                    background: getParameterValue('background'),
-                    duration: document.getElementById('toggle-duration').checked ? durationValue.textContent : null,
-                    
-                    audio: (enableModelSelectionCheckbox.checked === false || selectedModel === 'veo') && document.getElementById('toggle-audio').checked 
-                           ? document.getElementById('audio').value
-                           : null,
-                           
-                    details: document.getElementById('toggle-details').checked ? detailsTextarea.value.trim() : null,
-                    negative: document.getElementById('toggle-negative').checked ? negativePromptTextarea.value.trim() : null,
-                    generationModel: document.querySelector('input[name="generation-model"]:checked').value
-                };
-                
-                if (styleSelect.value === 'anime' && document.getElementById('toggle-style').checked) {
-                    const studio = animeStudioSelect.value;
-                    const animeStyle = animeStyleSelect.value;
-                    const manga = animeMangaInput.value.trim();
-
-                    if (studio) parameters.animeStudio = studio;
-                    if (animeStyle) parameters.animeStyle = animeStyle;
-                    if (manga) parameters.animeManga = manga;
+                const key = select.value; // Получаем ключ, например "realistic"
+                // 2. ИЩЕМ ЭТОТ КЛЮЧ В DATA.JS (в переменной dropdownData)
+                // Проверяем, что для этого id (style, camera...) есть карта в dropdownData
+                // И что у этой карты есть значение для нашего ключа
+                if (dropdownData[id] && dropdownData[id][key]) {
+                    // Возвращаем ПОЛНОЕ ЗНАЧЕНИЕ (Русский текст)
+                    return dropdownData[id][key];
                 }
-                parameters.quality = getParameterValue('quality');
-                parameters.animeArtist = getParameterValue('anime-artist');
-
-                return parameters;
+                
+                // 3. Если карты не найдено (например, для 'intensity-select' или "none")
+                // возвращаем сам ключ "как есть"
+                return key; 
             }
+
+            function collectAllParameters() {
+                    const selectedModel = document.querySelector('input[name="model"]:checked').value;
+                    const intensitySelect = document.getElementById('intensity-select');
+                    
+                    const parameters = {
+                        sceneComplexity: sceneComplexitySlider.value,
+                        fogIntensity: fogIntensitySelect.value,
+                        // 'intensity-select' не соответствует ключу 'intensity' в data.js,
+                        // поэтому getParameterValue вернет 'as-is' (что нам и нужно)
+                        intensityLevels: intensitySelect.value, 
+                        
+                        // Теперь эти вызовы будут работать правильно,
+                        // используя `getParameterValue` из Шага 1
+                        style: getParameterValue('style'),
+                        camera: getParameterValue('camera'),
+                        lighting: getParameterValue('lighting'),
+                        cinematography: getParameterValue('cinematography'),
+                        mood: getParameterValue('mood'),
+                        effect: getParameterValue('effect'),
+                        photoAnimation: getParameterValue('photo-animation'),
+                        background: getParameterValue('background'),
+                        quality: getParameterValue('quality'), // <--- ИСПРАВЛЕНО
+                        
+                        duration: document.getElementById('toggle-duration').checked ? durationValue.textContent : null,
+                        
+                        // <--- ВОТ ГЛАВНОЕ ИСПРАВЛЕНИЕ
+                        audio: (enableModelSelectionCheckbox.checked === false || selectedModel === 'veo') && document.getElementById('toggle-audio').checked 
+                               ? getParameterValue('audio') // <--- Мы вызываем нашу новую функцию
+                               : null,
+                               
+                        details: document.getElementById('toggle-details').checked ? detailsTextarea.value.trim() : null,
+                        negative: document.getElementById('toggle-negative').checked ? negativePromptTextarea.value.trim() : null,
+                        generationModel: document.querySelector('input[name="generation-model"]:checked').value
+                    };
+                    
+                    // <--- И ВОТ ВТОРОЕ ГЛАВНОЕ ИСПРАВЛЕНИЕ
+                    if (styleSelect.value === 'anime' && document.getElementById('toggle-style').checked) {
+                    
+                        // Используем `getParameterValue` для всех аниме-полей
+                        const studio = getParameterValue('anime-studio');
+                        const animeStyle = getParameterValue('anime-style');
+                        const artist = getParameterValue('anime-artist');
+                        const manga = animeMangaInput.value.trim();
+
+                        if (studio) parameters.animeStudio = studio;
+                        if (animeStyle) parameters.animeStyle = animeStyle;
+                        if (artist) parameters.animeArtist = artist; // <--- ДОБАВЛЕНО
+                        if (manga) parameters.animeManga = manga;
+                    }
+                    
+                    // Эти строки были лишними или в неправильном месте:
+                    // // parameters.quality = getParameterValue('quality');
+                    // // parameters.animeArtist = getParameterValue('anime-artist');
+                    
+                    return parameters;
+                }
 
 
             // !!! ВОТ ИЗМЕНЕННАЯ ФУНКЦИЯ (ЗАМЕНА СТАРОЙ) !!!
@@ -1293,6 +1320,10 @@
                     let finalPrompt = data.generatedPrompt;
                     currentRawPrompt = finalPrompt; // Сохраняем "чистый" промпт с сервера
                     updatePromptOutput(); // Вызываем отрисовку
+                    
+                    // ВАЖНО: Показываем секцию результата
+                    resultSection.classList.remove('hidden');
+                    resultSection.style.display = 'block';
                     
                     showNotification(isSuperImprove ? 'Промпт создан через Gemini!' : 'Промпт создан через Gemini!', 'success');
                     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
