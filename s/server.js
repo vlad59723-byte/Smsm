@@ -142,17 +142,6 @@ const validate = (schema) => (req, res, next) => {
   next();
 };
 
-function addComplexityDetails(prompt, sceneComplexity) {
-    if (!sceneComplexity) return prompt;
-    
-    if (sceneComplexity > 7) {
-        prompt += ", ultra-detailed, 8k, trending on artstation";
-    } else if (sceneComplexity > 5) {
-        prompt += ", highly detailed, photorealistic";
-    }
-    return prompt;
-}
-
 // РЕШЕНИЕ (Проблема 1: Зависимость от "fog"):
 // Функция переписана, чтобы добавлять универсальные теги атмосферы/освещения,
 // а не заменять конкретное слово "fog".
@@ -222,6 +211,17 @@ const generatePromptHandler = async (req, res, next) => {
     // Применяем улучшенные функции
     generatedPrompt = addComplexityDetails(generatedPrompt, parameters.sceneComplexity);
     generatedPrompt = applyIntensity(generatedPrompt, parameters.intensityLevels);
+
+    // --- ДОБАВЬТЕ ЭТОТ БЛОК ---
+    const fogIntensity = parameters.fogIntensity;
+    if (fogIntensity === 'slightly') {
+        generatedPrompt += ', slightly foggy';
+    } else if (fogIntensity === 'moderately') {
+        generatedPrompt += ', moderately smoky';
+    } else if (fogIntensity === 'extremely') {
+        generatedPrompt += ', extremely dense fog';
+    }
+    // --- КОНЕЦ БЛОКА ---
 
     // --- Логика "Режима Работы" ---
     if (operatingMode === 'no-names') {

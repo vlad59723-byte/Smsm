@@ -1060,26 +1060,6 @@
                 saveState();
             }
 
-            function applyIntensity(prompt, parameter, intensity) {
-                const intensityMap = {
-                    lighting: {
-                        slightly: 'soft ambient light, subtle rim lighting',
-                        moderately: 'dynamic volumetric lighting, strong key light',
-                        extremely: 'dramatic chiaroscuro, intense neon glow, overexposed highlights'
-                    },
-                    camera: {
-                        slightly: 'shallow depth of field, subtle camera shake',
-                        moderately: 'cinematic wide shot, moderate motion blur',
-                        extremely: 'extreme close-up, aggressive camera movement, hyper-detailed focus'
-                    }
-                };
-
-                if (intensityMap[parameter] && intensityMap[parameter][intensity]) {
-                    return prompt + ', ' + intensityMap[parameter][intensity];
-                }
-                return prompt;
-            }
-
             async function generateCustomPreset() {
                 const idea = subjectInput.value.trim();
                 if (!idea) {
@@ -1311,13 +1291,6 @@
                     
                     // 5. Отображение результата от Gemini
                     let finalPrompt = data.generatedPrompt;
-                    finalPrompt = applyIntensity(finalPrompt, 'lighting', intensitySelect.value);
-                    finalPrompt = applyIntensity(finalPrompt, 'camera', intensitySelect.value);
-
-                    if (parameters.fogIntensity && parameters.fogIntensity !== 'none') {
-                        finalPrompt += `, ${parameters.fogIntensity} fog`;
-                    }
-
                     currentRawPrompt = finalPrompt;
                     updatePromptOutput();
                     resultSection.style.display = 'block';
@@ -1342,22 +1315,22 @@
             }
             // --- Конец новой функции ---
 
-            function copyPrompt() {
-                const rawPrompt = promptOutput.textContent;
-                const formattedPrompt = formatPromptOutput(rawPrompt, outputFormat.value);
+function copyPrompt() {
+    // ИСПРАВЛЕНИЕ: Используем 'currentRawPrompt'
+    const formattedPrompt = formatPromptOutput(currentRawPrompt, outputFormat.value);
 
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(formattedPrompt)
-                        .then(() => {
-                            showNotification('Промпт скопирован в буфер обмена', 'success');
-                        })
-                        .catch(err => {
-                             showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
-                        });
-                } else {
-                     showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
-                }
-            }
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(formattedPrompt)
+            .then(() => {
+                showNotification('Промпт скопирован в буфер обмена', 'success');
+            })
+            .catch(err => {
+                    showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
+            });
+    } else {
+            showNotification('Не удалось скопировать. Попробуйте вручную.', 'warning');
+    }
+}
             
             function editPrompt() {
                 promptOutput.setAttribute('contenteditable', 'true');
@@ -1376,26 +1349,42 @@
                 editBtn.addEventListener('click', saveEditedPrompt);
             }
             
-            function saveEditedPrompt() {
-                promptOutput.setAttribute('contenteditable', 'false');
-                promptOutput.classList.remove('bg-white', 'ring-2', 'ring-blue-500');
-                promptOutput.classList.add('bg-gray-50');
-                
-                currentRawPrompt = promptOutput.textContent;
-                updatePromptOutput();
+function saveEditedPrompt() {
+    promptOutput.setAttribute('contenteditable', 'false');
+    promptOutput.classList.remove('bg-white', 'ring-2', 'ring-blue-500');
+    promptOutput.classList.add('bg-gray-50');
 
-                editBtn.innerHTML = `
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    Редактировать
-                `;
-                editBtn.classList.remove('bg-green-100', 'text-green-700', 'hover:bg-green-200');
-                editBtn.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-                
-                editBtn.removeEventListener('click', saveEditedPrompt);
-                editBtn.addEventListener('click', editPrompt);
-                
-                showNotification('Изменения сохранены', 'success');
-            }
+    // --- ИСПРАВЛЕНИЕ ---
+    // 1. Получаем видимый текст из div
+    let newText = promptOutput.innerText;
+
+    // 2. "Нормализуем" его обратно в промпт с запятыми:
+    //    - Заменяем маркеры списка "- " на пустую строку
+    //    - Заменяем переносы строк (\n) на ", "
+    newText = newText.replace(/-\s/g, '').replace(/\n/g, ', ');
+
+    //    - Очищаем от двойных запятых или пробелов
+    newText = newText.replace(/, *,/g, ',').replace(/, ,/g, ',');
+
+    // 3. Сохраняем как новый "чистый" промпт
+    currentRawPrompt = newText;
+
+    // 4. Перерисовываем
+    updatePromptOutput();
+    // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
+
+    editBtn.innerHTML = `
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+        Редактировать
+    `;
+    editBtn.classList.remove('bg-green-100', 'text-green-700', 'hover:bg-green-200');
+    editBtn.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+
+    editBtn.removeEventListener('click', saveEditedPrompt);
+    editBtn.addEventListener('click', editPrompt);
+
+    showNotification('Изменения сохранены', 'success');
+}
             
             function updateDurationValue() {
                 durationValue.textContent = durationSlider.value;
@@ -1798,30 +1787,37 @@
                 saveState();
             }
 
-            async function translateToEnglish() {
-                const prompt = promptOutput.textContent;
-                if (!prompt) {
-                    showNotification('Сначала сгенерируйте промпт.', 'warning');
-                    return;
-                }
+async function translateToEnglish() {
+    // ИСПРАВЛЕНИЕ: Используем 'currentRawPrompt'
+    const prompt = currentRawPrompt;
+    if (!prompt) {
+        showNotification('Сначала сгенерируйте промпт.', 'warning');
+        return;
+    }
 
-                try {
-                    const response = await fetch('http://localhost:3000/api/translate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: prompt,
-                            generationModel: document.querySelector('input[name="generation-model"]:checked').value
-                        })
-                    });
-                    const data = await response.json();
-                    promptOutput.textContent = data.translatedText;
-                    visualizePrompt();
-                    showNotification('Промпт переведен на английский.', 'success');
-                } catch (error) {
-                    showNotification('Ошибка перевода.', 'error');
-                }
-            }
+    try {
+        const response = await fetch('http://localhost:3000/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: prompt,
+                generationModel: document.querySelector('input[name="generation-model"]:checked').value
+            })
+        });
+        const data = await response.json();
+
+        // --- ИСПРАВЛЕНИЕ ---
+        // 1. Сохраняем "чистый" перевод
+        currentRawPrompt = data.translatedText;
+        // 2. Обновляем отображение
+        updatePromptOutput();
+        // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
+
+        showNotification('Промпт переведен на английский.', 'success');
+    } catch (error) {
+        showNotification('Ошибка перевода.', 'error');
+    }
+}
 
             async function generateIdeas(type = 'subject') {
                 try {
