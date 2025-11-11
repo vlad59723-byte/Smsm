@@ -236,9 +236,6 @@ const generatePromptHandler = async (req, res, next) => {
         generatedPrompt += ', extremely dense fog';
     }
 
-    // --- Логика "Режима Работы" ---
-    if (operatingMode === 'no-names') {
-    // ...
 
     // --- Логика "Режима Работы" ---
     if (operatingMode === 'no-names') {
