@@ -158,6 +158,21 @@ function applyIntensity(prompt, intensity) {
     return prompt + (intensityMap[intensity] || '');
 }
 
+// ВСТАВЬТЕ ЭТО В SERVER.JS
+
+function addComplexityDetails(prompt, sceneComplexity) {
+    if (!sceneComplexity) return prompt;
+
+    // Преобразование sceneComplexity в число
+    const complexity = parseInt(sceneComplexity);
+    
+    if (complexity > 7) {
+        prompt += ", ultra-detailed, 8k, trending on artstation";
+    } else if (complexity > 5) {
+        prompt += ", highly detailed, photorealistic";
+    }
+    return prompt;
+}
 
 const generatePromptHandler = async (req, res, next) => {
   try {
@@ -212,7 +227,6 @@ const generatePromptHandler = async (req, res, next) => {
     generatedPrompt = addComplexityDetails(generatedPrompt, parameters.sceneComplexity);
     generatedPrompt = applyIntensity(generatedPrompt, parameters.intensityLevels);
 
-    // --- ДОБАВЬТЕ ЭТОТ БЛОК ---
     const fogIntensity = parameters.fogIntensity;
     if (fogIntensity === 'slightly') {
         generatedPrompt += ', slightly foggy';
@@ -221,7 +235,10 @@ const generatePromptHandler = async (req, res, next) => {
     } else if (fogIntensity === 'extremely') {
         generatedPrompt += ', extremely dense fog';
     }
-    // --- КОНЕЦ БЛОКА ---
+
+    // --- Логика "Режима Работы" ---
+    if (operatingMode === 'no-names') {
+    // ...
 
     // --- Логика "Режима Работы" ---
     if (operatingMode === 'no-names') {
